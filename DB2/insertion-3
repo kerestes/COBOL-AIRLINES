@@ -1,0 +1,177 @@
+INSERT INTO AIRPORT (AIRPORTID, NAME, ADDRESS, CITY, COUNTRY, ZIPCODE)
+VALUES ('LHR', 'Heathrow airport', 'Longford TW6', 'Londres', 'Royaume Unis', 'TW6 1QT');
+
+INSERT INTO AIRPORT (AIRPORTID, NAME, ADDRESS, CITY, COUNTRY, ZIPCODE)
+VALUES ('AMS', 'Aéroport d'Amsterdam-Schiphol', 'Evert van de Beekstraat 202, 1118', 'Amsterdam', 'Hollande', '1118');
+
+INSERT INTO AIRPORT (AIRPORTID, NAME, ADDRESS, CITY, COUNTRY, ZIPCODE)
+VALUES ('FRA', 'Aéroport de Francfort-sur-le-Main', 'Aéroport de Francfort 60547 Frankfurt am Main Allemagne', 'Frankfurt', 'Allemagne', '	60549');
+
+INSERT INTO AIRPORT (AIRPORTID, NAME, ADDRESS, CITY, COUNTRY, ZIPCODE)
+VALUES ('ISL', 'Aéroport Atatürk d'Istanbul', 'Yeşilköy, 34149 Bakırköy', 'İstanbul', 'Turquie', '0000');
+
+INSERT INTO AIRPORT (AIRPORTID, NAME, ADDRESS, CITY, COUNTRY, ZIPCODE)
+VALUES ('MAD', 'Aéroport Adolfo Suárez Madrid-Barajas', 'Av de la Hispanidad, s/n', 'Madrid', 'Espagne', '28042');
+
+INSERT INTO AIRPLANE (AIRPLANEID, TYPE, NUMSEATS, TOTALFUEL) 
+VALUES ('BOEING02', '737-300', 200, 30);
+
+INSERT INTO AIRPLANE (AIRPLANEID, TYPE, NUMSEATS, TOTALFUEL) 
+VALUES ('BOEING03', '737-200', 130, 26);
+
+INSERT INTO AIRPLANE (AIRPLANEID, TYPE, NUMSEATS, TOTALFUEL) 
+VALUES ('BOEING04', '737-600', 300, 40);
+
+INSERT INTO AIRPLANE (AIRPLANEID, TYPE, NUMSEATS, TOTALFUEL) 
+VALUES ('AIRBUS03', 'A340', 230, 35);
+
+INSERT INTO AIRPLANE (AIRPLANEID, TYPE, NUMSEATS, TOTALFUEL) 
+VALUES ('AIRBUS04', 'A321', 180, 28);
+
+INSERT INTO AIRPLANE (AIRPLANEID, TYPE, NUMSEATS, TOTALFUEL) 
+VALUES ('AIRBUS05', 'A321', 180, 28);
+
+INSERT INTO AIRPLANE (AIRPLANEID, TYPE, NUMSEATS, TOTALFUEL) 
+VALUES ('AIRBUS06', 'A330', 260, 35);
+
+INSERT INTO EMPLO (EMPID, FIRSTNAME, LASTNAME, ADDRE, CITY, ZIPCODE,
+TELEPHONE, EMAIL, ADMIDATE, SALARY, DEPTID)
+VALUES ('10000031' ,'Robert', 'Antony', '24 rue de l abbaye', 
+'Limoges', '87000', '0700004444', 'robertantony@gmail.com', 
+'04/04/2012', 5000.98, 4);
+
+INSERT INTO EMPLO (EMPID, FIRSTNAME, LASTNAME, ADDRE, CITY, ZIPCODE,
+TELEPHONE, EMAIL, ADMIDATE, SALARY, DEPTID)
+VALUES ('10000032' ,'Marguarette', 'Rose', '12 square du lord', 
+'Paris', '75000', '0611112222', 'marguaretterose@gmail.com', 
+'10/21/2018', 4500.00, 4);
+
+INSERT INTO EMPLO (EMPID, FIRSTNAME, LASTNAME, ADDRE, CITY, ZIPCODE,
+TELEPHONE, EMAIL, ADMIDATE, SALARY, DEPTID)
+VALUES ('10000033' ,'Carolina', 'Pilolo', '123 rue vialube', 
+'Anthony', '94200', '0722334455', 'carolinapilolo@gmail.com', 
+'04/04/2012', 5000.98, 4);
+
+INSERT INTO EMPLO (EMPID, FIRSTNAME, LASTNAME, ADDRE, CITY, ZIPCODE,
+TELEPHONE, EMAIL, ADMIDATE, SALARY, DEPTID)
+VALUES ('10000034' ,'Andre', 'Rodriigues', '199 rue de mars', 
+'Lyon', '23000', '0712345678', 'andrerodrigues@gmail.com', 
+'10/04/2010', 7250.98, 2);
+
+INSERT INTO EMPLO (EMPID, FIRSTNAME, LASTNAME, ADDRE, CITY, ZIPCODE,
+TELEPHONE, EMAIL, ADMIDATE, SALARY, DEPTID)
+VALUES ('10000035' ,'Joana', 'Marley', '3456 avenue du midi', 
+'Nanterre', '92004', '0709876543', 'joanadumidi@gmail.com', 
+'05/12/2020', 6000.98, 3);
+
+INSERT INTO EMPLO (EMPID, FIRSTNAME, LASTNAME, ADDRE, CITY, ZIPCODE,
+TELEPHONE, EMAIL, ADMIDATE, SALARY, DEPTID)
+VALUES ('10000036' ,'Antonieta', 'Albuquerque', '98 allé de passage', 
+'Saint Denis', '95000', '0733445566', 'antonietaalbu@gmail.com', 
+'01/04/2018', 4333.98, 4);
+
+INSERT INTO EMPLO (EMPID, FIRSTNAME, LASTNAME, ADDRE, CITY, ZIPCODE,
+TELEPHONE, EMAIL, ADMIDATE, SALARY, DEPTID)
+VALUES ('10000037' ,'Marcio', 'Slat', '202 rue d hier', 
+'Rossy', '95100', '0666666666', 'marcioslat@gmail.com', 
+'02/23/2019', 4000.98, 4);
+
+INSERT INTO EMPLO (EMPID, FIRSTNAME, LASTNAME, ADDRE, CITY, ZIPCODE,
+TELEPHONE, EMAIL, ADMIDATE, SALARY, DEPTID)
+VALUES ('10000038' ,'Thiago', 'Robespierre', '1789 rue de la revolution', 
+'Bastille', '89000', '0789898989', 'thiagorob@gmail.com', 
+'09/09/1989', 4000.98, 4);
+
+INSERT INTO EMPLO (EMPID, FIRSTNAME, LASTNAME, ADDRE, CITY, ZIPCODE,
+TELEPHONE, EMAIL, ADMIDATE, SALARY, DEPTID)
+VALUES ('10000039' ,'Helena', 'Kerustch', '22 rue de la maternelle', 
+'Limoges', '87000', '0700004444', 'helenakeke@gmail.com', 
+'02/02/202&', 4000.98, 4);
+
+insert into crew (commander, copilote, fachief, fliattendant1, 
+fliattendant2, fliattendant3) values ('10000014', 
+'100000012', '10000010', '10000011', '10000024', '10000025'); 
+
+insert into crew (commander, copilote, fachief, fliattendant1, 
+fliattendant2, fliattendant3) values ('10000018', 
+'10000020', '10000026', '10000031', '100000032', '10000033'); 
+
+insert into crew (commander, copilote, fachief, fliattendant1, 
+fliattendant2, fliattendant3) values ('10000034', 
+'10000035', '10000036', '10000037', '10000038', '10000039'); 
+
+insert into shift(shiftdate, begintime, endtime, crewid) values 
+('09/01/2022', '10:00', '15:00', 21); 
+
+insert into shift(shiftdate, begintime, endtime, crewid) values 
+('09/01/2022', '10:00', '15:00', 22); 
+
+insert into shift(shiftdate, begintime, endtime, crewid) values 
+('09/01/2022', '10:00', '15:00', 23); 
+
+insert into flight (flightdate, deptime, arrtime, totpass, 
+totbagga, flightnum, shiftid, airplaneid, airportdep, airportarr) 
+values ('09/01/2022', '17:00:00', '20:00:00', 200, 15, 'CB2205', 
+9, 'AIRBUS01', 'FCO', 'CDG'); 
+
+insert into flight (flightdate, deptime, arrtime, totpass, 
+totbagga, flightnum, shiftid, airplaneid, airportdep, airportarr) 
+values ('09/01/2022', '10:00:00', '15:00:00', 200, 15, 'CB1104', 
+21, 'AIRBUS02', 'CDG', 'LIS'); 
+
+insert into flight (flightdate, deptime, arrtime, totpass, 
+totbagga, flightnum, shiftid, airplaneid, airportdep, airportarr) 
+values ('09/01/2022', '17:00:00', '20:00:00', 200, 15, 'CB1105', 
+21, 'AIRBUS02', 'LIS', 'CDG'); 
+
+insert into flight (flightdate, deptime, arrtime, totpass, 
+totbagga, flightnum, shiftid, airplaneid, airportdep, airportarr) 
+values ('09/01/2022', '10:00:00', '15:00:00', 200, 15, 'CB3304', 
+22, 'BOEING01', 'CDG', 'AMS'); 
+
+insert into flight (flightdate, deptime, arrtime, totpass, 
+totbagga, flightnum, shiftid, airplaneid, airportdep, airportarr) 
+values ('09/01/2022', '17:00:00', '20:00:00', 200, 15, 'CB3305', 
+22, 'BOEING01', 'AMS', 'CDG'); 
+
+insert into flight (flightdate, deptime, arrtime, totpass, 
+totbagga, flightnum, shiftid, airplaneid, airportdep, airportarr) 
+values ('09/01/2022', '10:00:00', '15:00:00', 200, 15, 'CB4404', 
+23, 'BOEING02', 'CDG', 'LHR'); 
+
+insert into flight (flightdate, deptime, arrtime, totpass, 
+totbagga, flightnum, shiftid, airplaneid, airportdep, airportarr) 
+values ('09/01/2022', '17:00:00', '20:00:00', 200, 15, 'CB4405', 
+23, 'BOEING02', 'LHR', 'CDG'); 
+
+UPDATE FLIGHT SET TOTPASS = (SELECT NUMSEATS FROM AIRPLANE WHERE
+AIRPLANEID = 'AIRBUS01') WHERE AIRPLANEID = 'AIRBUS01';
+
+UPDATE FLIGHT SET TOTPASS = (SELECT NUMSEATS FROM AIRPLANE WHERE
+AIRPLANEID = 'AIRBUS02') WHERE AIRPLANEID = 'AIRBUS02';
+
+UPDATE FLIGHT SET TOTPASS = (SELECT NUMSEATS FROM AIRPLANE WHERE
+AIRPLANEID = 'AIRBUS03') WHERE AIRPLANEID = 'AIRBUS03';
+
+UPDATE FLIGHT SET TOTPASS = (SELECT NUMSEATS FROM AIRPLANE WHERE
+AIRPLANEID = 'AIRBUS04') WHERE AIRPLANEID = 'AIRBUS04';
+
+UPDATE FLIGHT SET TOTPASS = (SELECT NUMSEATS FROM AIRPLANE WHERE
+AIRPLANEID = 'AIRBUS05') WHERE AIRPLANEID = 'AIRBUS05';
+
+UPDATE FLIGHT SET TOTPASS = (SELECT NUMSEATS FROM AIRPLANE WHERE
+AIRPLANEID = 'AIRBUS06') WHERE AIRPLANEID = 'AIRBUS06';
+
+UPDATE FLIGHT SET TOTPASS = (SELECT NUMSEATS FROM AIRPLANE WHERE
+AIRPLANEID = 'BOEING01') WHERE AIRPLANEID = 'BOEING01';
+
+UPDATE FLIGHT SET TOTPASS = (SELECT NUMSEATS FROM AIRPLANE WHERE
+AIRPLANEID = 'BOEING02') WHERE AIRPLANEID = 'BOEING02';
+
+UPDATE FLIGHT SET TOTPASS = (SELECT NUMSEATS FROM AIRPLANE WHERE
+AIRPLANEID = 'BOEING03') WHERE AIRPLANEID = 'BOEING03';
+
+UPDATE FLIGHT SET TOTPASS = (SELECT NUMSEATS FROM AIRPLANE WHERE
+AIRPLANEID = 'BOEING04') WHERE AIRPLANEID = 'BOEING04';
+
+UPDATE FLIGHT SET TOTBAGGA = 0; 
