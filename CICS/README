@@ -1,0 +1,5 @@
+In this folder will be placed the CICS maps and the respective COBOL programs.
+Initially the login process receives the user number and your password.
+It checks the password encryption with the file generated at the time of user registration.
+if the login is positive then the user is directed to the CICS map related to his own department. 
+At the moment it is only possible to login in the sales' department.
