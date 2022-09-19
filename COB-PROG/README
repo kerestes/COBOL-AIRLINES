@@ -1,0 +1,4 @@
+In this folder there are two procedures for feeding the database. With a Json file and with a XML files (8 files in fact).
+The transfer method chosen was the sftp connection. This transfer method transforming the entire document into a single line, on that case it was not possible to work with documents with more than 27920 characters. 
+So I was forced to divided the XML file into 8 parts. Therefore the files were placed on the mainframe system as UTF-8. 
+In the Json file case, the conversion to EBCDIC was not necessary. in the XML files case it was.
