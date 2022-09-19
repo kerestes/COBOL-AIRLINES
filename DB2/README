@@ -1,0 +1,3 @@
+This folder contains the files to create the database according to the entity relationship diagram. 
+And three others files with some procedures like insert and update to fill the database.
+Employees' and passengers' tables will be fed by a cobol program due the high number of data.
