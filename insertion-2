@@ -1,0 +1,63 @@
+update dept set manager = '10000029' where deptid = 1; 
+
+update dept set manager = '10000013' where deptid = 5; 
+
+update dept set manager = '10000027' where deptid = 6; 
+
+update dept set manager = '10000019' where deptid = 7; 
+
+update dept set manager = '10000017' where deptid = 8; 
+
+update dept set manager = '10000022' where deptid = 9; 
+
+insert into airport (airportid, name, address, city, country, 
+zipcode) values ('CDG', 'Aéroport Paris-Charles de Gaulles', 
+'Aéroport de Paris Rossy Charles de Gaulle', 'Rossy', 'France', 
+'95711'); 
+
+insert into airport (airportid, name, address, city, country, 
+zipcode)  values ('BOD' , 'Aéroport Bordeaux - Mérignac', 
+'Avenue René Cassin', 'Mérignac', 'France', '33700'); 
+
+insert into airport (airportid, name, address, city, country, 
+zipcode) values ('FCO', 
+'Aéroport Léonard-de-Vinci de Rome Fiumicino', 
+'Via Arturo Ferrarin, 2', 'Fiumicino', 'Italie', '00054'); 
+
+insert into airport (airportid, name, address, city, country, 
+zipcode) values ('LIS', 
+'Airoport international de Lisbonne Humberto Delegado', 
+'Alameda das Comunidades Portuguesas, 1700-111', 
+'Lisbonne', 'Portugal', '1700'); 
+
+insert into airplane (airplaneid, type, numseats, totalfuel) 
+values ('BOEING01', '737-200', 130, 26); 
+
+insert into airplane (airplaneid, type, numseats, totalfuel) 
+values ('AIRBUS01', 'A320', 150, 28); 
+
+insert into airplane (airplaneid, type, numseats, totalfuel) 
+values ('AIRBUS02', 'A340', 230, 35); 
+
+insert into passengers (firstname, lastname, address, city, 
+country, zipcode, telephone, email) values ('Maxime', 'Duprat', 
+'23 rue de New York', 'Rocherchouart', 'France', '87600', 
+'0666666666', 'maxime_duprat@gmail.com'); 
+
+insert into crew (commander, copilote, fachief, fliattendant1, 
+fliattendant2, fliattendant3) values ('10000003', 
+'10000004', '10000005', '10000007', '10000008', '10000009'); 
+
+insert into shift(shiftdate, begintime, endtime, crewid) values 
+('09/01/2022', '10:00', '15:00', 6); 
+
+insert into flight (flightdate, deptime, arrtime, totpass, 
+totbagga, flightnum, shiftid, airplaneid, airportdep, airportarr) 
+values ('01/09/2022', '10:00:00', '15:00:00', 200,15, 'CB2204', 
+9, 'airbus01', 'CDG', 'FCO'); 
+
+insert into buy (buydate, buytime, price, empid, clientid) 
+values ('08/09/2022', '10:03', 100.00, '10000006', 6); 
+                                                                  
+insert into ticket (ticketid, buyid, clientid, flightid, seat) 
+values ('CB00000001', 3, 6, 4, 'B04');
