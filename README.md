@@ -1,5 +1,5 @@
 # COBOL-AIRLINES
-COBOL + DB2 + CICS PROJECT - I DEVELOPED A AIRLINE INTERNAL SYSTEM - NAMED COBOL AIRLINES
+COBOL + DB2 + CICS PROJECT - I DEVELOPED A AIRLINE INTERNAL SYSTEM - CALLED COBOL AIRLINES
 This is a personal project which the goal is present and also develop my skills in COBOL, CICS and DB2.
 The project consists in the development of an internal system of an airline company.
 This project will be developed entirely in English, also with the objectif of demonstrating my skills in this language.
