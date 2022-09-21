@@ -1,6 +1,6 @@
 ****************************************************************    
 *                                                              *    
-*     THIS PROGAM READ AND CONVERTS A FILE IN JSON UTF-8       *    
+*     THIS PROGAM READ AND CONVERTS A JSON UTF-8 FILE          *    
 ****************************************************************    
  IDENTIFICATION                            DIVISION.                
  PROGRAM-ID. SUINSRT.                                               
