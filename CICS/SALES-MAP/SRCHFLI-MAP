@@ -194,8 +194,11 @@ MSG1     DFHMDF POS=(21,5),LENGTH=72,ATTRB=PROT,HILIGHT=UNDERLINE
          DFHMDF POS=(22,1),LENGTH=3,ATTRB=PROT,COLOR=RED,INITIAL='==>'  
 MSG2     DFHMDF POS=(22,5),LENGTH=72,ATTRB=PROT,HILIGHT=UNDERLINE       
          DFHMDF POS=(22,77),LENGTH=1,ATTRB=ASKIP                        
-         DFHMDF POS=(24,8),LENGTH=66,ATTRB=(PROT,BRT),COLOR=GREEN      X
-                INITIAL='F3=EXIT  F4=SEARCH FLIGHT  F5=SEARCH TICKET  FX
-               6=SELL  F7=PASS REG.'                                    
-         DFHMSD TYPE=FINAL     
-         END                            
+         DFHMDF POS=(24,8),LENGTH=08,ATTRB=(PROT,BRT),COLOR=GREEN      X
+                INITIAL='F3=EXIT '                                      
+         DFHMDF POS=(24,17),LENGTH=16,ATTRB=(PROT,BRT),COLOR=YELLOW    X
+                INITIAL='F4=SEARCH FLIGHT'                              
+         DFHMDF POS=(24,34),LENGTH=40,ATTRB=(PROT,BRT),COLOR=GREEN     X
+                INITIAL=' F5=SEARCH TICKET  F6=SELL  F7=PASS REG.'      
+         DFHMSD TYPE=FINAL                                              
+         END                                                            
