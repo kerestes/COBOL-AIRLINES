@@ -20,7 +20,7 @@ TERM     DFHMDF POS=(3,11),LENGTH=8,ATTRB=PROT,COLOR=BLUE
                 INITIAL='PROGRAMMING AT HEIGHTS'                        
          DFHMDF POS=(3,64),LENGTH=6,ATTRB=PROT,COLOR=BLUE,             X
                 INITIAL='TIME: '                                        
-LTIME    DFHMDF POS=(3,70),LENGTH=10,ATTRB=PROT,COLOR=BLUE              
+LHOUR    DFHMDF POS=(3,70),LENGTH=10,ATTRB=PROT,COLOR=BLUE              
          DFHMDF POS=(4,1),LENGTH=80,ATTRB=PROT,COLOR=BLUE,             X
                 INITIAL='**********************************************X
                *********************************'                       
