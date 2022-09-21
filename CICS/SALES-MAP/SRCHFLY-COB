@@ -713,6 +713,7 @@
           WHEN 0 
              PERFORM 0630-MOVE-INFO 
           WHEN 100 
+             PERFORM 0900-NOT-FIND
              CONTINUE 
           WHEN OTHER 
              PERFORM 0700-SQL-ERROR 
@@ -867,7 +868,7 @@
                                                                   
  0800-VERIFY-DATE. 
                                                                   
-     IF FDATEI(1:4) NOT NUMERIC OF FDATEI(6:2) NOT NUMERIC OR 
+     IF FDATEI(1:4) NOT NUMERIC OR FDATEI(6:2) NOT NUMERIC OR 
                                    FDATEI(9:2) NOT NUMERIC 
         MOVE 'N' TO WS-FLAG-DATE 
      ELSE 
@@ -878,3 +879,14 @@
      MOVE 'WRONG DATE FORMAT, TRY TO INSERT DATE AS YYYY-MM-DD' TO
                                                 MSG1O. 
                                                                                                                                                                                                                                                                                                                                                                                
+*****************************************************************
+* 0900-NOT-FIND.                                                *
+*                                                               * 
+* IF THE SQLCODE IS = 100 THAT MEANS DOES NOT EXIST ANY MORE    *
+* RELATED DATAS TO THE REASERCH, BUT IF FLIID0O IS EMPTY NO DATA*
+* WAS FIND BY THE REASERCH PARAMETERS.                          *
+*****************************************************************
+
+     IF FLIID0O = SPACE
+        MOVE  'THE INSERT INFORMATION DOES NOT MATCH WITH A CURREN
+-       T FLIGHT' TO MSG1O.
