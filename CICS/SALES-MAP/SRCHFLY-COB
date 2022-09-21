@@ -304,10 +304,10 @@
  0300-SEND-MAP. 
                                                                 
      MOVE WS-USERID TO USERIDO 
-     MOVE WS-TEMINAL TO TERMO 
+     MOVE WS-TERMINAL TO TERMO 
                                                                 
      EXEC CICS 
-         SEND MAP('LOGON') MAPSET('LOGINMP') ERASE 
+         SEND MAP('SRCHPA')  MAPSET('SRCHFLI') ERASE
      END-EXEC. 
                                                                 
 *************************************************************** 
@@ -334,10 +334,10 @@
 * IT RECEIVES THE USER INFORMATION TO BE PROCESSED            * 
 *************************************************************** 
                                                                  
- 0500-REECEIVE-MAP. 
+ 0500-RECEIVE-MAP. 
                                                                  
      EXEC CICS 
-         RECEIVE MAP('LOGON') MAPSET('LOGINMP') 
+         RECEIVE MAP('SRCHPA')  MAPSET('SRCHFLI') 
      END-EXEC. 
                                                                  
 *************************************************************** 
