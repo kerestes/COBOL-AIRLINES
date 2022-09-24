@@ -1,0 +1,163 @@
+****************************************************************      
+* PROGRAM NAME                 : PRINTCI                       *      
+* IMPORTANT FILE               : TICKET PRINT.                 *      
+* PROGRAMMER                   : KERESTES                      *      
+* DATE OF WRITEN               : SEPT. 2022                    *      
+* TECHNOLOGY                   : COBOL + JCL                   *      
+****************************************************************      
+*                   PROBLEM  DEFINITION                        *      
+*                                                              *      
+*   THE PROGRAM RECEIVE THE PASSENGER INFORMATION AND CREATE   *      
+*                     THE PRINT TICKET                         *      
+****************************************************************      
+* INPUT PARAMETERS:                                            *      
+*                                                              *      
+* PASSENGERS INFORMATION - ACCEPT STATEMENT                    *      
+****************************************************************      
+* OUTPUT PARAMETERS:                                           *      
+*                                                              *      
+* PRINT DOCUMENT                                               *      
+****************************************************************      
+                                                                      
+****************************************************************      
+*                  IDENTIFICATION DIVISION.                    *      
+****************************************************************      
+                                                                      
+ IDENTIFICATION DIVISION.                                             
+ PROGRAM-ID. PRINTCI.                                                 
+                                                                      
+****************************************************************      
+*                       DATA DIVISION.                         *      
+****************************************************************      
+                                                                      
+ DATA DIVISION.                                                       
+                                                                      
+*------------------------*                                            
+ WORKING-STORAGE SECTION.                                           
+*------------------------*                                          
+                                                                    
+****************************************************************    
+*                         WS VARAIBLES                         *    
+****************************************************************    
+                                                                    
+ 01 TABLE-PRINT.                                                    
+    02 FULL-NAME                    PIC X(45).                      
+    02 FSEAT                        PIC X(3).                       
+    02 FLIGHTNUM                    PIC X(6).                       
+    02 DAIR                         PIC X(4).                       
+    02 LAIR                         PIC X(4).                       
+    02 FDATE                        PIC X(10).                      
+    02 TDEP                         PIC X(5).                       
+    02 FULLDATE                     PIC X(9).                       
+    02 FULLCITY1                    PIC X(20).                      
+    02 FULLCITY2                    PIC X(20).                      
+                                                                    
+ 01 TICKET-LINE                     PIC X(95).                      
+                                                                    
+****************************************************************    
+*                     PROCEDURE DIVISION.                      *    
+****************************************************************    
+                                                                    
+ PROCEDURE DIVISION.                                                
+                                                                    
+ MAIN-PARA.                                                         
+                                                                    
+     PERFORM 0100-ACCEPT                                            
+     PERFORM 0200-DISPLAY                                           
+                                                                    
+     GOBACK.                                                        
+                                                                    
+****************************************************************    
+* 0100-ACCEPT                                                  *    
+*                                                              * 
+* ACCEPT THE DATA FROM A JCL JOB                               * 
+**************************************************************** 
+                                                                  
+ 0100-ACCEPT. 
+                                                                  
+     ACCEPT FULL-NAME 
+     ACCEPT FSEAT 
+     ACCEPT FLIGHTNUM 
+     ACCEPT DAIR 
+     ACCEPT LAIR 
+     ACCEPT FDATE 
+     ACCEPT TDEP 
+     ACCEPT FULLDATE 
+     ACCEPT FULLCITY1 
+     ACCEPT FULLCITY2. 
+                                                                  
+**************************************************************** 
+* 0300-DISPLAY                                                 * 
+*                                                              * 
+* IT DISPLAY THE INFORMATIONS FROM THE CLIENT AND FLIGHT.      * 
+* THE JOB WHICH WILL CALL THIS PROGRAM MUST CHOOSE THE PRINTER * 
+* MSGCLASS ( JOB MSGCLASS=PRINTER) DEFINED BY THE ADMINSTRATOR * 
+**************************************************************** 
+                                                                  
+ 0200-DISPLAY. 
+                                                                  
+                                                                  
+     MOVE '|' TO TICKET-LINE(70:1) 
+     DISPLAY TICKET-LINE. 
+                                                                  
+     MOVE 'BORDING PASS               COBOL AIRLINES' TO 
+                                TICKET-LINE(11:45) 
+     MOVE '|' TO  TICKET-LINE(70:1) 
+     DISPLAY TICKET-LINE. 
+                                                                  
+      MOVE SPACE TO TICKET-LINE 
+     MOVE '|' TO  TICKET-LINE(70:1) 
+     MOVE FULL-NAME (1:20) TO TICKET-LINE(73:20) 
+     DISPLAY TICKET-LINE. 
+                                                                  
+     MOVE SPACE TO TICKET-LINE 
+     MOVE 'PASSENGER NAME' TO TICKET-LINE(11:15) 
+     MOVE 'SEAT' TO TICKET-LINE(54:4) 
+     MOVE '|' TO TICKET-LINE(70:1) 
+     MOVE 'FROM:' TO TICKET-LINE(73:5) 
+     MOVE DAIR TO TICKET-LINE(79:3) 
+     MOVE 'TO:' TO TICKET-LINE(84:3) 
+     MOVE LAIR TO TICKET-LINE(88:3) 
+     DISPLAY TICKET-LINE 
+                                                                  
+     MOVE SPACE TO TICKET-LINE 
+     MOVE FULL-NAME TO TICKET-LINE(11:45) 
+     MOVE FSEAT TO TICKET-LINE(54:3) 
+     MOVE '|' TO TICKET-LINE(70:1) 
+     DISPLAY TICKET-LINE 
+                                                                  
+     MOVE SPACE TO TICKET-LINE 
+     MOVE '|' TO TICKET-LINE(70:1) 
+     MOVE 'FLIGHT:' TO TICKET-LINE(73:7) 
+     MOVE FLIGHTNUM TO TICKET-LINE(81:6) 
+     DISPLAY TICKET-LINE 
+                                                                  
+     MOVE SPACE TO TICKET-LINE 
+     MOVE 'FROM:' TO TICKET-LINE(11:5) 
+     MOVE FULLCITY1 TO TICKET-LINE(17:20) 
+     MOVE 'TO:' TO TICKET-LINE(44:3) 
+     MOVE FULLCITY2 TO TICKET-LINE(48:20) 
+     MOVE '|' TO TICKET-LINE(70:1) 
+     DISPLAY TICKET-LINE 
+                                                                  
+     MOVE SPACE TO TICKET-LINE 
+     MOVE '|' TO TICKET-LINE(70:1) 
+     MOVE 'DATE:' TO TICKET-LINE(73:5) 
+     MOVE FDATE TO TICKET-LINE(79:10) 
+     DISPLAY TICKET-LINE 
+                                                         
+     MOVE SPACE TO TICKET-LINE 
+     MOVE 'FLIGHTID:' TO TICKET-LINE(11:9) 
+     MOVE FLIGHTNUM TO TICKET-LINE(21:6) 
+     MOVE 'DATE:' TO TICKET-LINE(32:5) 
+     MOVE FULLDATE TO TICKET-LINE(39:9) 
+     MOVE 'TIME:' TO TICKET-LINE(53:5) 
+     MOVE TDEP TO TICKET-LINE(59:5) 
+     MOVE '|' TO TICKET-LINE(70:1) 
+     MOVE 'SEAT:' TO TICKET-LINE(73:5) 
+     MOVE FSEAT TO TICKET-LINE(79:3) 
+     DISPLAY TICKET-LINE 
+                                                         
+     MOVE SPACE TO TICKET-LINE 
+     MOVE '|' TO TICKET-LINE(70:1) 
+     DISPLAY TICKET-LINE.  

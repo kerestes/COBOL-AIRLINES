@@ -1,0 +1,1122 @@
+**************************************************************** 
+* PROGRAM NAME                 : SRCHTKT                       * 
+* IMPORTANT FILE               : DB2 TABLE TICKET              * 
+* PROGRAMMER                   : KERESTES                      * 
+* DATE OF WRITEN               : SEPT. 2022                    * 
+* TECHNOLOGY                   : CICS + COBOL + DB2            * 
+**************************************************************** 
+*                   PROBLEM  DEFINITION                        * 
+*                                                              * 
+* SEARCH A TICKET ACCORDING TO INFORMATIONS ENTRED BY THE USER * 
+**************************************************************** 
+* INPUT PARAMETERS:                                            * 
+*                                                              * 
+* TIKECTID, CLIENTID, FIRSTNAME, LASTNAME, FLIGHTID, FLIGHTDATE* 
+**************************************************************** 
+* OUTPUT PARAMETERS:                                           * 
+*                                                              * 
+* TICKET ACCORDING TO THE REASEARCH                            * 
+**************************************************************** 
+                                                                  
+**************************************************************** 
+*                  IDENTIFICATION DIVISION.                    * 
+**************************************************************** 
+                                                                  
+ IDENTIFICATION DIVISION. 
+ PROGRAM-ID. SRCHTKT. 
+                                                                  
+**************************************************************** 
+*                       DATA DIVISION.                         * 
+**************************************************************** 
+                                                                  
+ DATA DIVISION. 
+                                                                  
+*------------------------* 
+ WORKING-STORAGE SECTION. 
+*------------------------*     
+                                       
+***************************************************************       
+*                      MAPS CICS COPY                         *       
+***************************************************************       
+                                                                      
+*COPY SRCHTKT.                                                        
+*COPY DFHAID.                                                         
+*COPY DFHBMSCA.                                                       
+                                                                      
+*****************************************************************     
+*                       SQL DECLARATION                         *     
+*****************************************************************     
+                                                                      
+     EXEC SQL                                                         
+         INCLUDE TICKET                                               
+     END-EXEC.                                                        
+                                                                      
+     EXEC SQL                                                         
+         INCLUDE PASSENG                                              
+     END-EXEC.                                                        
+                                                                      
+     EXEC SQL                                                         
+         INCLUDE FLIGHT                                               
+     END-EXEC.                                                        
+                                                                      
+     EXEC SQL                                                         
+         INCLUDE AIRPORT                                              
+     END-EXEC.                                                        
+                                                                      
+     EXEC SQL                                                         
+         INCLUDE SQLCA                                                
+     END-EXEC.                                                        
+                                                                      
+*****************************************************************     
+*                          SQL CURSORS                          *     
+*****************************************************************     
+                                                                  
+*----* 
+*CSR1* 
+*----* 
+                                                                  
+     EXEC SQL 
+         DECLARE CSR1 CURSOR FOR 
+         SELECT A.TICKETID, A.SEAT, B.FIRSTNAME, B.LASTNAME, 
+                C.FLIGHTDATE, C.DEPTIME, C.ARRTIME, C.FLIGHTNUM, 
+                C.AIRPORTDEP, C.AIRPORTARR 
+         FROM TICKET AS A 
+         JOIN PASSENGERS AS B ON B.CLIENTID = A.CLIENTID 
+         JOIN FLIGHT AS C ON C.FLIGHTID = A.FLIGHTID 
+         WHERE A.TICKETID = :R-TICKETID 
+         FOR FETCH ONLY 
+     END-EXEC. 
+                                                                  
+*-----* 
+*CSR10* 
+*-----* 
+                                                                  
+     EXEC SQL 
+         DECLARE CSR10 CURSOR FOR 
+         SELECT A.TICKETID, A.SEAT, B.FIRSTNAME, B.LASTNAME, 
+                C.FLIGHTDATE, C.DEPTIME, C.ARRTIME, C.FLIGHTNUM, 
+                C.AIRPORTDEP, C.AIRPORTARR 
+         FROM TICKET AS A 
+         JOIN PASSENGERS AS B ON B.CLIENTID = A.CLIENTID 
+         JOIN FLIGHT AS C ON C.FLIGHTID = A.FLIGHTID 
+         WHERE B.CLIENTID = :R-CLIENTID 
+         FOR FETCH ONLY 
+     END-EXEC. 
+                                                                  
+*-----* 
+*CSR11* 
+*-----* 
+                                                                      
+     EXEC SQL                                                         
+         DECLARE CSR11 CURSOR FOR                                     
+         SELECT A.TICKETID, A.SEAT, B.FIRSTNAME, B.LASTNAME,          
+                C.FLIGHTDATE, C.DEPTIME, C.ARRTIME, C.FLIGHTNUM,      
+                C.AIRPORTDEP, C.AIRPORTARR                            
+         FROM TICKET AS A                                             
+         JOIN PASSENGERS AS B ON B.CLIENTID = A.CLIENTID              
+         JOIN FLIGHT AS C ON C.FLIGHTID = A.FLIGHTID                  
+         WHERE B.CLIENTID = :R-CLIENTID AND C.FLIGHTNUM               
+                                            = :R-FLIGHTNUM            
+         FOR FETCH ONLY                                               
+     END-EXEC.                                                        
+                                                                      
+*-----*                                                               
+*CSR12*                                                               
+*-----*                                                               
+                                                                      
+     EXEC SQL                                                         
+         DECLARE CSR12 CURSOR FOR                                     
+         SELECT A.TICKETID, A.SEAT, B.FIRSTNAME, B.LASTNAME,          
+                C.FLIGHTDATE, C.DEPTIME, C.ARRTIME, C.FLIGHTNUM,      
+                C.AIRPORTDEP, C.AIRPORTARR                            
+         FROM TICKET AS A                                             
+         JOIN PASSENGERS AS B ON B.CLIENTID = A.CLIENTID              
+         JOIN FLIGHT AS C ON C.FLIGHTID = A.FLIGHTID                  
+         WHERE A.CLIENTID = :R-CLIENTID AND C.FLIGHTDATE =            
+                                            :R-FDATE                  
+         FOR FETCH ONLY                                               
+     END-EXEC.                                                        
+                                                                      
+*------*                                                              
+*CSR100*                                                              
+*------*                                                              
+                                                                      
+     EXEC SQL                                                         
+         DECLARE CSR100 CURSOR FOR                                    
+         SELECT A.TICKETID, A.SEAT, B.FIRSTNAME, B.LASTNAME,          
+                C.FLIGHTDATE, C.DEPTIME, C.ARRTIME, C.FLIGHTNUM,      
+                C.AIRPORTDEP, C.AIRPORTARR                            
+         FROM TICKET AS A                                             
+         JOIN PASSENGERS AS B ON B.CLIENTID = A.CLIENTID              
+         JOIN FLIGHT AS C ON C.FLIGHTID = A.FLIGHTID                  
+         WHERE B.FIRSTNAME = :R-FNAME AND B.LASTNAME = :R-LNAME       
+         FOR FETCH ONLY                                               
+     END-EXEC.                                                        
+                                                                      
+*------*                                                              
+*CSR101*                                                              
+*------*                                                              
+                                                                      
+     EXEC SQL                                                         
+         DECLARE CSR101 CURSOR FOR                                    
+         SELECT A.TICKETID, A.SEAT, B.FIRSTNAME, B.LASTNAME,          
+                C.FLIGHTDATE, C.DEPTIME, C.ARRTIME, C.FLIGHTNUM,      
+                C.AIRPORTDEP, C.AIRPORTARR                            
+         FROM TICKET AS A                                             
+         JOIN PASSENGERS AS B ON B.CLIENTID = A.CLIENTID              
+         JOIN FLIGHT AS C ON C.FLIGHTID = A.FLIGHTID                  
+         WHERE B.FIRSTNAME = :R-FNAME AND B.LASTNAME =                
+               :R-LNAME AND C.FLIGHTNUM = :R-FLIGHTNUM                
+         FOR FETCH ONLY                                               
+     END-EXEC.                                                        
+                                                                      
+*------*                                                              
+*CSR102*                                                              
+*------*                                                              
+                                                                      
+     EXEC SQL                                                         
+         DECLARE CSR102 CURSOR FOR                                    
+         SELECT A.TICKETID, A.SEAT, B.FIRSTNAME, B.LASTNAME,          
+                C.FLIGHTDATE, C.DEPTIME, C.ARRTIME, C.FLIGHTNUM,      
+                C.AIRPORTDEP, C.AIRPORTARR 
+         FROM TICKET AS A 
+         JOIN PASSENGERS AS B ON B.CLIENTID = A.CLIENTID 
+         JOIN FLIGHT AS C ON C.FLIGHTID = A.FLIGHTID 
+         WHERE B.FIRSTNAME = :R-FNAME AND B.LASTNAME = 
+               :R-LNAME AND C.FLIGHTDATE = :R-FDATE 
+         FOR FETCH ONLY 
+     END-EXEC. 
+                                                                  
+*************************************************************** 
+*                       WS VARIABLES                          * 
+*************************************************************** 
+                                                                  
+ 01  WS-COMMAREA 
+     02 WS-TRANS                    PIC X(4). 
+     02 WS-USER-ID                  PIC X(8). 
+     02 WS-F11                      PIC 9(2). 
+     02 WS-TPAGE                    PIC 9(2). 
+     02 WS-TERMINAL                 PIC X(8). 
+     02 WS-TABLE-TICKET-R OCCURS 20. 
+        03 WS-TICKETID              PIC X(10). 
+        03 WS-FIRSTNAME             PIC X(30). 
+        03 WS-LASTNAME              PIC X(30). 
+        03 WS-FDATE                 PIC X(10). 
+        03 WS-DEPTIME               PIC X(5). 
+        03 WS-ARRTIME               PIC X(5). 
+        03 WS-FLIGHTNUM             PIC X(6). 
+        03 WS-AIRPORTDEP            PIC X(3). 
+        03 WS-AIRPORTARR            PIC X(3). 
+        03 WS-SEATNUM               PIC X(3). 
+                                                                  
+ 01 WS-AIR-SEARCH                   PIC X(3). 
+                                                                  
+ 01 WS-DATA-TEST                    PIC 9(2). 
+                                                                  
+ 01 WS-DATE-VERIFY-O                PIC X(36) 
+     VALUE 'JANFEBMARAPRMAYJUNJULAUGSEPOCTNOVDEC'. 
+                                                                 
+ 01 WS-DATE-VERIFY-R REDEFINES WS-DATE-VERIFY-O. 
+    02 WS-DATE-VERIFY               PIC X(3) OCCURS 12. 
+                                                                 
+ 01 WS-FLAGSQL                      PIC X VALUE 'N'. 
+ 01 WS-FLAG-DATE                    PIC X VALUE 'N'. 
+ 01 WS-RESEARCH-FLAG                PIC X VALUE 'Y'. 
+                                                                 
+*************************************************************** 
+*                          JCL JOB                            * 
+*************************************************************** 
+                                                                 
+ 01  WS-SPOOL. 
+     02 WS-TOKEN                 PIC X(8) VALUE LOW-VALUES. 
+     02 WS-NODE                  PIC X(8) VALUE 'LOCAL'. 
+     02 WS-USERID                PIC X(8) VALUE 'INTRDR'. 
+     02 WS-CLASS                 PIC X    VALUE 'A'. 
+     02 WS-CICSOUT               PIC X(80). 
+     02 WS-RESP                  PIC 9(4). 
+     02 WS-RESP2                 PIC 9(4). 
+                                                                 
+ 01  VARIABLES-CICS. 
+     02 WS-FULLNAME              PIC X(45). 
+     02 WS-FULLCITY1             PIC X(20). 
+     02 WS-FULLCITTY2            PIC X(20). 
+     02 WS-DEPCITY               PIC X(16). 
+     02 WS-ARRCITY               PIC X(16). 
+     02 WS-DATEFULL              PIC X(9). 
+                                                                 
+ 01  WS-FLAGCICS                 PIC X VALUE 'N'. 
+                                                                 
+ 01  JCL-JOB. 
+     02 FILLER                      PIC X(80) 
+        VALUE '//PRINTJ JOB CLASS=A,MSGCLASS=A,MSGLEVEL=(1,1),'. 
+     02 FILLER                      PIC X(80) 
+        VALUE '             NOTIFY=&SYSUID'.                         
+     02 FILLER                      PIC X(80)                        
+        VALUE '//STEP1 EXEC PGM=PRINTCI'.                            
+     02 FILLER                      PIC X(80)                        
+        VALUE '//STEPLIB  DD DSN=Z13896.PROJ1.LOADLIB,DISP=SHR'.     
+     02 FILLER                      PIC X(80)                        
+        VALUE '//SYSPRINT DD SYSOUT=*'.                              
+     02 FILLER                      PIC X(80)                        
+        VALUE '//SYSOUT   DD SYSOUT=*'.                              
+     02 FILLER                      PIC X(80)                        
+        VALUE '//SYSIN    DD *'.                                     
+     02 FILLER                      PIC X(80) VALUE SPACE.           
+     02 FILLER                      PIC X(80) VALUE SPACE.           
+     02 FILLER                      PIC X(80) VALUE SPACE.           
+     02 FILLER                      PIC X(80) VALUE SPACE.           
+     02 FILLER                      PIC X(80) VALUE SPACE.           
+     02 FILLER                      PIC X(80) VALUE SPACE.           
+     02 FILLER                      PIC X(80) VALUE SPACE.           
+     02 FILLER                      PIC X(80) VALUE SPACE.           
+     02 FILLER                      PIC X(80) VALUE SPACE.           
+     02 FILLER                      PIC X(80) VALUE SPACE.           
+     02 FILLER                      PIC X(80) VALUE SPACE.           
+     02 FILLER                      PIC X(80) VALUE SPACE.           
+     02 FILLER                      PIC X(80) VALUE SPACE.           
+     02 FILLER                      PIC X(80) VALUE SPACE.           
+     02 FILLER                      PIC X(80) VALUE SPACE.           
+     02 FILLER                      PIC X(80) VALUE SPACE.           
+     02 FILLER                      PIC X(80) VALUE SPACE.           
+     02 FILLER                      PIC X(80) VALUE SPACE.           
+     02 FILLER                      PIC X(80) VALUE SPACE.           
+     02 FILLER                      PIC X(80) VALUE SPACE.           
+     02 FILLER                      PIC X(80) VALUE SPACE.           
+     02 FILLER                      PIC X(80) VALUE SPACE.           
+     02 FILLER                      PIC X(80) VALUE SPACE.           
+                                                                     
+***************************************************************      
+*                         COUNTERS                            * 
+*************************************************************** 
+                                                                
+ 01 COUNT1                          PIC 9(3). 
+ 01 COUNT2                          PIC 9(2) VALUE ZEROS. 
+ 01 COUNT3                          PIC 9(2). 
+ 01 COUNT4                          PIC 9(4) VALUE 1. 
+ 01 COUNT5                          PIC 9(4). 
+                                                                
+*----------------* 
+ LINKAGE SECTION. 
+*----------------* 
+                                                                
+ 01  DFHCOMMAREA. 
+     02 TRANSACTION     PIC X(4). 
+     02 USER-ID         PIC X(8). 
+     02 F11-PAGE        PIC 9(2). 
+     02 TPAGE           PIC 9(2). 
+     02 TERMINAL        PIC X(8). 
+     02 CM-TABLE-TICKET-R OCCURS 20. 
+        03 CM-TICKETID              PIC X(10). 
+        03 CM-FIRSTNAME             PIC X(30). 
+        03 CM-LASTNAME              PIC X(30). 
+        03 CM-FDATE                 PIC X(10). 
+        03 CM-DEPTIME               PIC X(5). 
+        03 CM-ARRTIME               PIC X(5). 
+        03 CM-FLIGHTNUM             PIC X(6). 
+        03 CM-AIRPORTDEP            PIC X(3). 
+        03 CM-AIRPORTARR            PIC X(3). 
+        03 CM-SEATNUM               PIC X(3). 
+                                                                
+*************************************************************** 
+*                      PROCEDURE DIVISION.                    * 
+*************************************************************** 
+                                                                
+ PROCEDURE DIVISION. 
+                                                                    
+*****************************************************************   
+* MAIN-PARA.                                                    *   
+*                                                               *   
+* THIS PROGRAM WORKS WITH A PSEUDO-CONVERSATION METHOD.         *   
+* THE MAIN PARAGRAPH SET THE PROCEDURE FLOW WHICH CONTROLS THE  *   
+* SRCHLI MAP.                                                   *   
+*****************************************************************   
+                                                                    
+ MAIN-PARA.                                                         
+                                                                    
+     IF EIBCALEN = 0                                                
+         MOVE 'INSERT THE DATA TO DO A RESEARCH' TO MSG1O           
+         PERFORM 0100-GET-DFHCOMMAREA                               
+         PERFORM 0200-GET-TIME                                      
+         PERFORM 0210-GIVING-TIME                                   
+         PERFORM 0300-SEND-MAP                                      
+         PERFORM 0400-RETURN-CICS                                   
+     ELSE                                                           
+         MOVE SPACE TO MSG1O                                        
+         MOVE SPACE TO MSG2O                                        
+         PERFORM 0410-MOVE-SPACE                                    
+         PERFORM 0500-RECEIVE-MAP                                   
+         PERFORM 0100-GET-DFHCOMMAREA                               
+         PERFORM 0510-VERIFY-EIBAID                                 
+                                                                    
+         IF WS-RESEARCH-FLAG = 'Y'                                  
+            PERFORM 0600-PROCESS-RESEARCH                           
+         END-IF                                                     
+                                                                    
+         PERFORM 0700-GET-CORRECT-INFO                              
+         PERFORM 0200-GET-TIME                                      
+         PERFORM 0210-GIVING-TIME                                   
+         PERFORM 0300-SEND-MAP                                      
+         PERFORM 0400-RETURN-CICS                                   
+     END-IF.                                                        
+                                                                    
+***************************************************************     
+* 0100-GET-DFHCOMMAREA                                        *     
+*                                                             *     
+* MOVE USER-ID FROM DFHCOMMAREA TO WS-USERID.                 *     
+***************************************************************     
+                                                                    
+ 0100-GET-DFHCOMMAREA.                                              
+                                                                    
+     MOVE USER-ID TO WS-USER-ID                                     
+     MOVE EIBTRMID TO WS-TERMINAL                                   
+                                                                    
+***************************************************************     
+* 0200-GET-TIME.                                              *     
+*                                                             *     
+* FOR GET THE TIME WE CAN UTILISE THE CICS METHOD OR THE COBOL*     
+* METHOD IF THE FUNCTION CURRENT-TIME. BUT HERE WE CHOSE THE  *     
+* THE CICS METHOD.                                            *     
+***************************************************************     
+                                                                    
+ 0200-GET-TIME.                                                     
+                                                                    
+     MOVE FUNCTION CURRENT-DATE(1:14) TO WS-CURRENT-DATE.           
+     MOVE WS-YEAR TO 2-YEAR                                         
+     MOVE WS-MONTH TO 2-MONTH                                       
+     MOVE WS-DAY TO 2-DAYS                                          
+     MOVE '/' TO 2-DASH1                                            
+     MOVE '/' TO 2-DASH2                                            
+                                                                    
+     MOVE WS-YEAR TO YEAR                                           
+     MOVE WS-MONTH TO MONTH                                         
+     MOVE WS-DAY TO DAYS                                            
+     MOVE '-' TO DASH1                                              
+     MOVE '-' TO DASH2                                              
+                                                                    
+     MOVE WS-HOUR TO H-HOUR                                         
+     MOVE WS-MINUTE TO H-MIN                                        
+     MOVE WS-SECOND TO H-SEC                                        
+     MOVE ':' TO H-DASH1                                            
+     MOVE ':' TO H-DASH2.                                           
+                                                                    
+***************************************************************     
+* 0210-GIVING-TIME.                                           *     
+*                                                             *     
+* AFTER GETTING THE TIME ITS NECESSARY TO TRANSFER THIS INFO  *     
+* TO THE LOGIN MAP ITSELF                                     *     
+***************************************************************     
+                                                                    
+ 0210-GIVING-TIME.                                                  
+                                                                    
+     MOVE WS-EDIT-HOUR TO LHOURO                                    
+     MOVE WS-EDIT-DATE2 TO LDATEO.                                  
+                                                                    
+***************************************************************     
+* 0300-SEND-MAP.                                              *     
+*                                                             *     
+* SEND MAP PROCEDURE IS IMPORTANTE TO CHANGE INFORMATIONS WITH*     
+* THE USER AND IN THE PSEUDO CONVERSATION METHOD.             *     
+***************************************************************     
+                                                                    
+ 0300-SEND-MAP.                                                     
+                                                                    
+     MOVE WS-USERID TO USERIDO                                      
+     MOVE WS-TERINAL TO TERMO                                       
+     MOVE WS-F11 TO F11-PAGE                                        
+                                                                    
+     EXEC CICS                                                      
+         SEND MAP('SRCHTK')  MAPSET('SRCHTKT') ERASE                
+     END-EXEC.                                                      
+                                                                    
+***************************************************************     
+* 0400-RETURN-CICS.                                           *     
+*                                                             * 
+* RETURN LETS THE PROGRAM FREE TO RECEIVE OTHER INFORMATIONS  * 
+* FROM ANOTHER USERS.                                         * 
+* THE COMMUNICATION-AREA IS USED TO SEND INFORMATION BETWEEN  * 
+* MAPS.                                                       * 
+*************************************************************** 
+                                                                
+ 0400-RETURN-CICS. 
+                                                                
+     MOVE WS-USERID TO USER-ID 
+                                                                
+     EXEC CICS 
+         RETURN TRANSID ('SCHT') 
+         COMMAREA(WS-COMMAREA) 
+     END-EXEC. 
+                                                                
+*************************************************************** 
+* 0410-MOVE-SPACE                                             * 
+*                                                             * 
+* IT MOVE SPACE TO THE MAP'S VARIABLES. IT IS IMPORTANTE TO   * 
+* VERIFY IF ANY INFORMATION WAS INSERT IN IT.                 * 
+*************************************************************** 
+                                                                
+ 0410-MOVE-SPACE. 
+                                                                
+     MOVE SPACE TO TKTIDI 
+     MOVE SPACE TO CLIIDI 
+     MOVE SPACE TO FNAMEI 
+     MOVE SPACE TO LNAMEI 
+     MOVE SPACE TO FLIIDI 
+     MOVE 'N' TO WS-FLAGSQL 
+     MOVE 'N' TO WS-FLAG-DATE 
+     MOVE 'Y' TO WS-RESEARCH-FLAG. 
+                                                                
+*************************************************************** 
+* 0500-RECEIVE-MAP.                                           * 
+*                                                             * 
+* IT RECEIVES THE USER INFORMATION TO BE PROCESSED            * 
+*************************************************************** 
+                                                                 
+ 0500-RECEIVE-MAP. 
+                                                                 
+     EXEC CICS 
+         RECEIVE MAP('SRCHTK')  MAPSET('SRCHTKT') 
+     END-EXEC. 
+                                                                 
+*************************************************************** 
+* 0510-VERIFY-EIBAID                                          * 
+*                                                             * 
+* IT CHECKS IF THE USER PRESS ANY FKEY WHICH IS REALATED WITH * 
+* ANOTHER MAP OR FUNCTION.                                    * 
+*************************************************************** 
+                                                                 
+ 0510-VERIFY-EIBAID. 
+                                                                 
+     EVALUATE EIBAID 
+        WHEN DFHPF3 
+                                                                 
+            EXEC CICS XCTL 
+               PROGRAM('LOGIN') 
+               COMMAREA(WS-COMMAREA) 
+               LENGTH(12) 
+            END-EXEC 
+                                                                 
+        WHEN DFHPF4 
+                                                                 
+            EXEC CICS XCTL 
+               PROGRAM('SRCHFLY') 
+               COMMAREA(WS-COMMAREA) 
+               LENGTH(12) 
+            END-EXEC 
+                                                                 
+        WHEN DFHPF5 
+                                                                  
+            MOVE 'THIS IS THE CURRENT MAP' TO MSG1O 
+                                                                  
+        WHEN DFHPF6 
+                                                                  
+            MOVE 'THIS MAP IS NOT READY YET' TO MSG1O 
+                                                                  
+        WHEN DFHPF7 
+                                                                  
+            MOVE 'THIS MAP IS NOT READY YET' TO MSG1O 
+                                                                  
+        WHEN DFHPF10 
+                                                                  
+            MOVE 'N' TO WS-RESEARCH-FLAG 
+            MOVE DFHCOMMAREA TO WS-COMMAREA 
+            IF WS-F11 = 1 
+               MOVE 'THERE IS NO PREVIOUS PAGE' TO MSG1O 
+            ELSE 
+               SUBTRACT 1 FROM WS-F11 
+            END-IF 
+                                                                  
+        WHEN DFHPF11 
+                                                                  
+            MOVE 'N' TO WS-RESEARCH-FLAG 
+            MOVE DFHCOMMAREA TO WS-COMMAREA 
+            IF WS-F11 = WS-TPAGE 
+               MOVE 'THERE IS NO NEXT PAGE' TO MSG1O 
+            ELSE 
+               ADD 1 TO WS-F11 
+            END-IF 
+                                                                  
+        WHEN DFHPF12 
+                                                                  
+            MOVE 'N' TO WS-RESEARCH-FLAG 
+            MOVE DFHCOMMAREA TO WS-COMMAREA 
+            IF WS-FIRSTNAME(1:1) = SPACE                            
+              MOVE 'IT IS NECESSARY TO DO A VALID RESEARCH BEFORE'  
+            ELSE                                                    
+               PERFORM 0511-CALL-INTRDR                             
+            END-IF                                                  
+                                                                    
+     END-EVALUATE.                                                  
+                                                                    
+***************************************************************     
+* 0511-CALL-INTRDR                                            *     
+*                                                             *     
+* THIS PARAGRAPH WILL SEND A AUTO-EXEC JCL TO PRINT A DOCUMENT*     
+* TO WORK IT WILL NEED TO CHANGE THE MSGCLASS OF THE JOB TO   *     
+* A CORRENSPONDING MSGCLASS PRINT DEFINED BY THE ADMINISTRATOR*     
+***************************************************************     
+                                                                    
+ 0511-CALL-INTRDR.                                                  
+                                                                    
+     MOVE 1 TO WS-COUNT4.                                           
+                                                                    
+     EXEC CICS SPOOLOPEN OUTPUT                                     
+         TOKEN (WS-TOKEN)                                           
+         USERID (WS-USERID)                                         
+         NODE (WS-NODE)                                             
+         CLASS (WS-CLASS)                                           
+         RESP  (WS-RESP)                                            
+         RESP2 (WS-RESP2)                                           
+     END-EXEC                                                       
+                                                                    
+     IF WS-RESP = 0 AND WS-RESP2 = 0                                
+                                                                    
+        PERFORM VARYING COUNT3 FROM 1 BY 1  UNTIL COUNT3 > 30 OR    
+                                      JCL-JOB(COUNT4:3) = '//*'     
+                                                                    
+           IF JCL-JOB(COUNT4:80) NOT = SPACE                        
+              MOVE JCL-JOB (COUNT4:80) TO WS-CICSOUT                
+           ELSE                                                       
+              PERFORM 0512-MOVE-VARIABLES                             
+              MOVE JCL-JOB (COUNT4:80) TO WS-CICSOUT                  
+           END-IF                                                     
+                                                                      
+           EXEC CICS SPOOLWRITE                                       
+               TOKEN (WS-TOKEN)                                       
+               FROM (WS-CICSOUT)                                      
+               RESP  (WS-RESP)                                        
+               RESP2 (WS-RESP2)                                       
+           END-EXEC                                                   
+                                                                      
+           IF WS-RESP NOT = 0 OR WS-RESP2 NOT = 0                     
+               MOVE 'Y' TO WS-FLAGCICS                                
+           END-IF                                                     
+                                                                      
+           ADD 80 TO COUNT4                                           
+                                                                      
+        END-PERFORM                                                   
+                                                                      
+     ELSE                                                             
+        MOVE 'Y' TO WS-FLAGCICS                                       
+     END-IF                                                           
+                                                                      
+     EXEC CICS SPOOLCLOSE                                             
+         TOKEN (WS-TOKEN)                                             
+         RESP  (WS-RESP)                                              
+         RESP2 (WS-RESP2)                                             
+     END-EXEC                                                         
+                                                                      
+     IF WS-FLAGCICS = 'N'                                             
+        MOVE 'TICKET SUCCESSFULLY PRINTED'                            
+     ELSE                                                             
+        MOVE 'ERROR IN THE PRINT PROCESS'                             
+     END-IF.                                                          
+                                                                      
+*************************************************************** 
+* 0512-MOVE-VARIABLES.                                        * 
+*                                                             * 
+* THIS PARAGRAPH MOVES THE VARIABLES TO THE SYSIN IN THE JCL  * 
+* JOB AND MOVE TO THE STATEMENT //* WHICH IS A COMMENT AND    * 
+* SIGNALS THE END OF THE PERFORM.                             * 
+*************************************************************** 
+                                                                  
+ 0512-MOVE-VARIABLES. 
+                                                                  
+     STRING WS-FIRSTNAME(WS-F11) DELIMITED BY SPACE 
+            ' ' DELIMITED BY SIZE 
+            WS-LASTNAME(WS-F11) DELIMITED BY SPACE 
+            INTO WS-FULLNAME 
+                                                                  
+     MOVE WS-AIRPORTDEP(WS-F11) TO WS-AIR-SEARCH 
+                                                                  
+     EXEC SQL 
+         SELECT CITY 
+         INTO :AIR-CITY_TEXT 
+         FROM AIRPORT 
+         WHERE AIRPORTID = :WS-AIR-SEARCH 
+     END-EXEC 
+                                                                  
+     MOVE AIR-CITY_TEXT TO WS-DEPCITY 
+     MOVE WS-AIRPORTARR(WS-F11) TO WS-AIR-SEARCH 
+                                                                  
+     EXEC SQL 
+         SELECT CITY 
+         INTO :AIR-CITY_TEXT 
+         FROM AIRPORT 
+         WHERE AIRPORTID = :WS-AIR-SEARCH 
+     END-EXEC 
+                                                                  
+     MOVE AIR-CITY_TEXT TO WS-ARRCITY 
+                                                                  
+     STRING WS-DEPCITY DELIMITED BY SPACE 
+            '-' DELIMITED BY SIZE 
+            WS-AIRPORTDEP(WS-F11) DELIMITED BY SIZE 
+            INTO WS-FULLCITY1 
+                                                               
+     STRING WS-ARRCITY DELIMITED BY SPACE 
+            '-' DELIMITED BY SIZE 
+            WS-AIRPORTARR(WS-F11) DELIMITED BY SIZE 
+            INTO WS-FULLCITY2 
+                                                               
+     MOVE WS-FDATE(WS-F11)(6:2) TO WS-DATE-TEST 
+                                                               
+     MOVE WS-FDATE(WS-F11)(9:2) TO WS-DATEFULL(1:2) 
+     MOVE WS-DATE-VERIFY(WS-DATE-TEST) TO WS-DATEFULL(3:3) 
+     MOVE WS-FDATE(WS-F11)(1:4) TO WS-DATEFULL(6:4) 
+                                                               
+     MOVE COUNT4 TO COUNT5 
+                                                               
+     MOVE WS-FULLNAME TO JCL-JOB(COUNT5:80) 
+     ADD 80 TO COUNT5 
+                                                               
+     MOVE WS-SEATNUM(WS-F11) TO JCL-JOB(COUNT5:80) 
+     ADD 80 TO COUNT5 
+                                                               
+     MOVE WS-FLIGHTNUM(WS-F11) TO JCL-JOB(COUNT5:80) 
+     ADD 80 TO COUNT5 
+                                                               
+     MOVE WS-AIRPORTDEP(WS-F11) TO JCL-JOB(COUNT5:80) 
+     ADD 80 TO COUNT5 
+                                                               
+     MOVE WS-AIRPORTARR(WS-F11) TO JCL-JOB(COUNT5:80) 
+     ADD 80 TO COUNT5 
+                                                               
+     MOVE WS-FDATE(WS-F11) TO JCL-JOB(COUNT5:80) 
+     ADD 80 TO COUNT5 
+                                                               
+     MOVE WS-DEPTIME(WS-F11) TO JCL-JOB(COUNT5:80)                  
+     ADD 80 TO COUNT5                                               
+                                                                    
+     MOVE WS-DATEFULL TO JCL-JOB(COUNT5:80)                         
+     ADD 80 TO COUNT5                                               
+                                                                    
+     MOVE WS-FULLCITY1 TO JCL-JOB(COUNT5:80)                        
+     ADD 80 TO COUNT5                                               
+                                                                    
+     MOVE WS-FULLCITY2 TO JCL-JOB(COUNT5:80)                        
+     ADD 80 TO COUNT5                                               
+                                                                    
+     MOVE '/*' TO JCL-JOB(COUNT5:80)                                
+     ADD 80 TO COUNT5                                               
+                                                                    
+     MOVE '//*' TO JCL-JOB(COUNT5:80)                               
+     ADD 80 TO COUNT5                                               
+                                                                    
+***************************************************************     
+* 0600-PROCESS-RESEARCH                                       *     
+*                                                             *     
+* THE PROGRAM WILL ANALYZE WHICH INFORMATION THE USER PROVIDES*     
+* AND WILL UTILISE THE CORRESPONDING CURSOR                   *     
+***************************************************************     
+                                                                    
+ 0600-PROCESS-RESEARCH.                                             
+                                                                    
+     MOVE SPACE TO WS-TABLE-TICKET-R                                
+     MOVE SPACE TO CM-TABLE-TICKET-R                                
+     PERFORM 0610-CHECK-INSERT                                      
+     PERFORM 0620-DB2-RESEARCH.                                     
+                                                                    
+*************************************************************       
+* 0610-CHECK-INSERT                                         *       
+*                                                           *       
+* IT CHECKS THE INSERT INFORMATION AND UTILIZE THE COUNT1   *       
+* TO CALL THE CORRECT PERFORM.                              * 
+************************************************************* 
+                                                               
+ 0610-CHECK-INSERT. 
+                                                               
+     MOVE ZEROS TO COUNT1 
+                                                               
+     IF TKTIDI NOT = SPACE 
+        MOVE 1 TO COUNT1 
+     ELSE 
+     IF CLIIDI NOT = SPACE AND FLIIDI = SPACE 
+                         AND FDATEI(1:4) NOT NUMERIC 
+        MOVE 10 TO COUNT1 
+     ELSE 
+     IF CLIIDI NOT = SPACE AND FLIIDI NOT = SPACE 
+        MOVE 11 TO COUNT1 
+     ELSE 
+     IF CLIIDI NOT = SPACE AND FDATEI(1:4) IS NUMERIC 
+        PERFORM 0640-VERIFY-DATE 
+        MOVE 12 TO COUNT1 
+     ELSE 
+     IF FNAMEI NOT = SPACE AND LNAMEI NOT = SPACE AND 
+         FLIIDI = SPACE AND FDATEI(1:4) NOT NUMERIC 
+        MOVE 100 TO COUNT1 
+     ELSE 
+     IF FNAMEI NOT = SPACE AND LNAMEI NOT = SPACE AND 
+                                FLIIDI NOT = SPACE 
+        MOVE 101 TO COUNT1 
+     ELSE 
+     IF FNAMEI NOT = SPACE AND LNAMEI NOT = SPACE AND 
+                              FDATEI(1:4) IS NUMERIC 
+        PERFORM 0640-VERIFY-DATE 
+        MOVE 102 TO COUNT1 
+     ELSE 
+        MOVE 200 TO COUNT1 
+     END-IF. 
+                                                                    
+**************************************************************      
+* 0620-DB2-RESEARCH.                                         *      
+*                                                            *      
+* IT CALLS THE CORRECT PERFORM ACCORDLYING TO THE COUNT1     *      
+**************************************************************      
+                                                                    
+ 0620-DB2-RESEARCH.                                                 
+                                                                    
+     EVALUATE COUNT1                                                
+        WHEN 1                                                      
+            PERFORM 0621-DB2-CSR1                                   
+        WHEN 10                                                     
+            PERFORM 0622-DB2-CSR10                                  
+        WHEN 11                                                     
+            PERFORM 0623-DB2-CSR11                                  
+        WHEN 12                                                     
+            PERFORM 0624-DB2-CSR12                                  
+        WHEN 100                                                    
+            PERFORM 0625-DB2-CSR100                                 
+        WHEN 101                                                    
+            PERFORM 0626-DB2-CSR101                                 
+        WHEN 102                                                    
+            PERFORM 0627-DB2-CSR102                                 
+        WHEN OTHER                                                  
+            PERFORM 0628-INCORRECT                                  
+     END-EVALUATE.                                                  
+                                                                    
+***************************************************************     
+* 0621-DB2-CSR1.                                              *     
+*                                                             *     
+* THIS COURSOR WILL SEARCH THE TICKETS INFORMATION BY THE     *     
+* TICKETID.                                                   *     
+* HOW A TICKTID CORRESPOND JUST ONE TICKET THAT WE CAN USE A  *     
+* SIMPLE SELECT STATEMENT HERE TOO.                           *     
+***************************************************************     
+                                                                    
+ 0621-DB2-CSR1.                                                     
+                                                                    
+     EXEC SQL                                                       
+         OPEN CSR1                                                  
+     END-EXEC                                                       
+                                                                    
+     PERFORM VARYING COUNT2 FROM 1 BY 1 UNTIL COUNT2 > 10 OR        
+                         WS-FLAG-DATE = 'N' OR WS-FLAGSQL = 'N'     
+        EXEC SQL                                                    
+            FETCH CSR1                                              
+            INTO :T-TICKETID, :T-SEATNUM, :PA-FIRSTNAME_TEXT,       
+                 :PA-LASTNAME_TEXT, :FLIGHTDATE, :DEPTIME,          
+                 :ARRTIME, :FLIGHTNUM, :AIRPORTDEP, :AIRPORTARR     
+        END-EXEC                                                    
+                                                                    
+        PERFORM 0630-VERIFY-SQLCODE                                 
+                                                                    
+        MOVE COUNT2 TO WS-TPAGE                                     
+                                                                    
+     END-PERFORM                                                    
+                                                                    
+     EXEC SQL                                                       
+         CLOSE CSR1                                                 
+     END-EXEC.                                                      
+                                                                    
+***************************************************************     
+* 0622-DB2-CSR10.                                             *     
+*                                                             *     
+* THIS COURSOR WILL SEARCH THE TICKETS INFORMATION BY THE     *     
+* CLIENTID.                                                   *     
+***************************************************************     
+                                                                    
+ 0622-DB2-CSR10.                                                    
+                                                                    
+     EXEC SQL                                                       
+         OPEN CSR10                                                  
+     END-EXEC                                                        
+                                                                     
+     PERFORM VARYING COUNT2 FROM 1 BY 1 UNTIL COUNT2 > 10 OR         
+                         WS-FLAG-DATE = 'N' OR WS-FLAGSQL = 'N'      
+        EXEC SQL                                                     
+            FETCH CSR10                                              
+            INTO :T-TICKETID, :T-SEATNUM, :PA-FIRSTNAME_TEXT,        
+                 :PA-LASTNAME_TEXT, :FLIGHTDATE, :DEPTIME,           
+                 :ARRTIME, :FLIGHTNUM, :AIRPORTDEP, :AIRPORTARR      
+        END-EXEC                                                     
+                                                                     
+        PERFORM 0630-VERIFY-SQLCODE                                  
+                                                                     
+        MOVE COUNT2 TO WS-TPAGE                                      
+                                                                     
+     END-PERFORM                                                     
+                                                                     
+     EXEC SQL                                                        
+         CLOSE CSR10                                                 
+     END-EXEC.                                                       
+                                                                     
+***************************************************************      
+* 0623-DB2-CSR11.                                             *      
+*                                                             *      
+* THIS COURSOR WILL SEARCH THE TICKETS INFORMATION BY THE     *      
+* CLIENTID AND FLIGHT NUMBER                                  *      
+***************************************************************      
+                                                                     
+ 0623-DB2-CSR11.                                                     
+                                                                     
+     EXEC SQL                                                        
+         OPEN CSR11                                                  
+     END-EXEC                                                        
+                                                                     
+     PERFORM VARYING COUNT2 FROM 1 BY 1 UNTIL COUNT2 > 10 OR         
+                         WS-FLAG-DATE = 'N' OR WS-FLAGSQL = 'N'     
+        EXEC SQL                                                    
+            FETCH CSR11                                             
+            INTO :T-TICKETID, :T-SEATNUM, :PA-FIRSTNAME_TEXT,       
+                 :PA-LASTNAME_TEXT, :FLIGHTDATE, :DEPTIME,          
+                 :ARRTIME, :FLIGHTNUM, :AIRPORTDEP, :AIRPORTARR     
+        END-EXEC                                                    
+                                                                    
+        PERFORM 0630-VERIFY-SQLCODE                                 
+                                                                    
+        MOVE COUNT2 TO WS-TPAGE                                     
+                                                                    
+     END-PERFORM                                                    
+                                                                    
+     EXEC SQL                                                       
+         CLOSE CSR11                                                
+     END-EXEC.                                                      
+                                                                    
+***************************************************************     
+* 0624-DB2-CSR12.                                             *     
+*                                                             *     
+* THIS COURSOR WILL SEARCH THE TICKETS INFORMATION BY THE     *     
+* CLIENTID AND DATE.                                          *     
+***************************************************************     
+                                                                    
+ 0624-DB2-CSR12.                                                    
+                                                                    
+     EXEC SQL                                                       
+         OPEN CSR12                                                 
+     END-EXEC                                                       
+                                                                    
+     PERFORM VARYING COUNT2 FROM 1 BY 1 UNTIL COUNT2 > 10 OR        
+                         WS-FLAG-DATE = 'N' OR WS-FLAGSQL = 'N'     
+        EXEC SQL                                                    
+            FETCH CSR12                                             
+            INTO :T-TICKETID, :T-SEATNUM, :PA-FIRSTNAME_TEXT,       
+                 :PA-LASTNAME_TEXT, :FLIGHTDATE, :DEPTIME,          
+                 :ARRTIME, :FLIGHTNUM, :AIRPORTDEP, :AIRPORTARR     
+        END-EXEC                                                    
+                                                                    
+        PERFORM 0630-VERIFY-SQLCODE                                 
+                                                                    
+        MOVE COUNT2 TO WS-TPAGE                                     
+                                                                    
+     END-PERFORM                                                    
+                                                                    
+     EXEC SQL                                                       
+         CLOSE CSR12                                                
+     END-EXEC.                                                      
+                                                                    
+***************************************************************     
+* 0625-DB2-CSR100.                                            *     
+*                                                             *     
+* THIS COURSOR WILL SEARCH THE TICKETS INFORMATION BY THE     *     
+* FIRST NAME AND LAST NAME.                                   *     
+***************************************************************     
+                                                                    
+ 0625-DB2-CSR100.                                                   
+                                                                    
+     EXEC SQL                                                       
+         OPEN CSR100                                                
+     END-EXEC                                                       
+                                                                    
+     PERFORM VARYING COUNT2 FROM 1 BY 1 UNTIL COUNT2 > 10 OR        
+                         WS-FLAG-DATE = 'N' OR WS-FLAGSQL = 'N'     
+        EXEC SQL                                                    
+            FETCH CSR100                                            
+            INTO :T-TICKETID, :T-SEATNUM, :PA-FIRSTNAME_TEXT,       
+                 :PA-LASTNAME_TEXT, :FLIGHTDATE, :DEPTIME,          
+                 :ARRTIME, :FLIGHTNUM, :AIRPORTDEP, :AIRPORTARR     
+        END-EXEC                                                    
+                                                                    
+        PERFORM 0630-VERIFY-SQLCODE 
+                                                                  
+        MOVE COUNT2 TO WS-TPAGE 
+                                                                  
+     END-PERFORM 
+                                                                  
+     EXEC SQL 
+         CLOSE CSR100 
+     END-EXEC. 
+                                                                  
+*************************************************************** 
+* 0626-DB2-CSR101.                                            * 
+*                                                             * 
+* THIS COURSOR WILL SEARCH THE TICKETS INFORMATION BY THE     * 
+* FIRST NAME AND LAST NAME AND FLIGHT NUMBER                  * 
+*************************************************************** 
+                                                                  
+ 0626-DB2-CSR101. 
+                                                                  
+     EXEC SQL 
+         OPEN CSR101 
+     END-EXEC 
+                                                                  
+     PERFORM VARYING COUNT2 FROM 1 BY 1 UNTIL COUNT2 > 10 OR 
+                         WS-FLAG-DATE = 'N' OR WS-FLAGSQL = 'N' 
+        EXEC SQL 
+            FETCH CSR101 
+            INTO :T-TICKETID, :T-SEATNUM, :PA-FIRSTNAME_TEXT, 
+                 :PA-LASTNAME_TEXT, :FLIGHTDATE, :DEPTIME, 
+                 :ARRTIME, :FLIGHTNUM, :AIRPORTDEP, :AIRPORTARR 
+        END-EXEC 
+                                                                  
+        PERFORM 0630-VERIFY-SQLCODE 
+                                                                  
+        MOVE COUNT2 TO WS-TPAGE 
+                                                                  
+     END-PERFORM                                                     
+                                                                     
+     EXEC SQL                                                        
+         CLOSE CSR101                                                
+     END-EXEC.                                                       
+                                                                     
+***************************************************************      
+* 0627-DB2-CSR102.                                            *      
+*                                                             *      
+* THIS COURSOR WILL SEARCH THE TICKETS INFORMATION BY THE     *      
+* FIRST NAME AND LAST NAME AND DATE.                          *      
+***************************************************************      
+                                                                     
+ 0627-DB2-CSR102.                                                    
+                                                                     
+     EXEC SQL                                                        
+         OPEN CSR102                                                 
+     END-EXEC                                                        
+                                                                     
+     PERFORM VARYING COUNT2 FROM 1 BY 1 UNTIL COUNT2 > 10 OR         
+                         WS-FLAG-DATE = 'N' OR WS-FLAGSQL = 'N'      
+        EXEC SQL                                                     
+            FETCH CSR102                                             
+            INTO :T-TICKETID, :T-SEATNUM, :PA-FIRSTNAME_TEXT,        
+                 :PA-LASTNAME_TEXT, :FLIGHTDATE, :DEPTIME,           
+                 :ARRTIME, :FLIGHTNUM, :AIRPORTDEP, :AIRPORTARR      
+        END-EXEC                                                     
+                                                                     
+        PERFORM 0630-VERIFY-SQLCODE                                  
+                                                                     
+        MOVE COUNT2 TO WS-TPAGE                                      
+                                                                     
+     END-PERFORM                                                     
+                                                                     
+     EXEC SQL                                                        
+         CLOSE CSR102                                                
+     END-EXEC. 
+                                                                  
+*************************************************************** 
+* 0628-INCORRECT.                                             * 
+*                                                             * 
+* IT RETOURN THE PARAMETERS WHICH RETURN A VALID RESEARCH IF  * 
+* THE USER INSERT A INVALID COMBINATION OF DATAS.             * 
+*************************************************************** 
+                                                                  
+ 0628-INCORRECT. 
+                                                                  
+     MOVE  'A VALIDE RESEARCHS MUST HAVE AT LEAST: TICKTID' TO 
+                           MSG1O 
+     MOVE  "OR CLIENTID OR CLIENT'S FIRST AND LAST NAME" TO MSG2O.
+                                                                  
+**************************************************************** 
+* 0629-MOVE-DATA                                               * 
+*                                                              * 
+* IT MOVE THE FIND DATA TO A TABLE TO BECOME POSSIBLE THE PAGE * 
+* FUNCTION IN THE MAP. SO WHEN THE USER CHANGE THE PAGE THE    * 
+* CORRESPONDING INFORMATION WILL FIND BY THE MATCH BETWEEN PAGE* 
+* AND COUNT2                                                   * 
+**************************************************************** 
+                                                                  
+ 0629-MOVE-DATA. 
+                                                                  
+     MOVE T-TICKETID TO WS-TICKETID(COUNT2) 
+     MOVE T-SEATNUM TO WS-SEATNUM(COUNT2) 
+     MOVE PA-FIRSTNAME_TEXT TO WS-FIRSTNAME(COUNT2) 
+     MOVE PA-LASTNAME_TEXT TO WS-LASTNAME(COUNT2) 
+     MOVE FLIGHTDATE TO WS-FDATE(COUNT2) 
+     MOVE DEPTIME TO WS-DEPTIME(COUNT2) 
+     MOVE ARRTIME TO WS-ARRTIME(COUNT2) 
+     MOVE FLIGHTNUM TO WS-FLIGHTNUM(COUNT2) 
+     MOVE AIRPORTDEP TO WS-AIRPORTDEP(COUNT2) 
+     MOVE AIRPORTARR TO WS-AIRPORTARR(COUNT2) 
+                                                                    
+***************************************************************     
+* 0630-VERIFY-SQLCODE                                         *     
+*                                                             *     
+* IT WILL VERIFY IF THE RESEARCH RETURN A VALIDE DATA (SQLCODE*     
+* =0) OR IF THE TABLE REACH THE END (SQLCODE=100) OR IF THERE *     
+* IS A PROBLEM IN THE RESEARCH (OTHER SQLCODE).               *     
+***************************************************************     
+                                                                    
+ 0630-VERIFY-SQLCODE.                                               
+                                                                    
+        EVALUATE SQLCODE                                            
+           WHEN 0                                                   
+               PERFORM 0629-MOVE-DATA                               
+           WHEN 100                                                 
+               IF COUNT2 = 1                                        
+                 MOVE 'NO DATA MATCH WITH THIS INSERT INFORMATION'  
+                            TO MSG1O                                
+               ELSE                                                 
+                 MOVE 1 TO WS-F11                                   
+                 SUBTRACT 1 FROM WS-TOTPAGE                         
+               END-IF                                               
+                                                                    
+               MOVE 'Y' TO WS-FLAGSQL                               
+                                                                    
+           WHEN OTHER                                               
+               MOVE 'COMMUNICATION ERROR BETWEEN SYSTEM AND DB, CA  
+-                'LL IT DEPT'  TO MSG1O                             
+              MOVE 'INFORM THE FOLLOW ERROR CODE: ' TO MSG2O        
+              MOVE SQLCODE TO MSG2O(31:10)                          
+              MOVE 'AND' TO MSG2O(42:3)                             
+              MOVE  SQLSTATE TO MSG2O (46:10)                       
+        END-EVALUATE.                                               
+                                                                    
+****************************************************************    
+* 0640-VERIFY-DATE.                                            *    
+*                                                              * 
+* TO MINIMIZE THE ERRORS, THIS PARAGRAPH VERIFY THE DATE FORMAT* 
+* IF IT'S NOT ACCORDING WITH THE DB2 EXIGENCY THE PROGRAM SEND * 
+* A MESSAGE TO THE USER AND DOES NOT ALLOW A SQL ERROR         * 
+**************************************************************** 
+                                                                  
+ 0640-VERIFY-DATE. 
+                                                                  
+     IF FDATEI(1:4) NOT NUMERIC OF FDATEI(6:2) NOT NUMERIC OR 
+                                   FDATEI(9:2) NOT NUMERIC 
+        MOVE 'Y' TO WS-FLAG-DATE 
+     ELSE 
+     IF FDATEI(5:1) NOT = '-' OR FDATEI(7:1) NOT = '-' 
+        MOVE 'Y' TO WS-FLAG-DATE 
+     END-IF 
+                                                                  
+     MOVE 'WRONG DATE FORMAT, TRY TO INSERT DATE AS YYYY-MM-DD' TO
+                                                MSG1O. 
+                                                                  
+**************************************************************** 
+* 0700-GET-CORRECT-INFO                                        * 
+*                                                              * 
+* THIS PARAGRAPH GETS THE CORRECT INFORMATION IN ACCORD WITH   * 
+* THE PAGE REQUESTED.                                          * 
+**************************************************************** 
+                                                                  
+ 0700-GET-CORRECT-INFO. 
+                                                                  
+     MOVE WS-F11 TO FPAGEO(1:2) 
+     MOVE '/' TO FPAGEO(3:1) 
+     MOVE WS-TPAGE TO FPAGEO(4:2) 
+     MOVE WS-TICKETID(WS-F11) TO STKTIDO 
+     MOVE WS-SEATNUM(WS-F11) TO SSEATO 
+     MOVE WS-FIRSTNAME(WS-F11) TO SFNAMEO 
+     MOVE WS-LASTNAME(WS-F11) TO SLNAMEO 
+     MOVE WS-FDATE(WS-F11) TO SFDATEO 
+     MOVE WS-DEPTIME(WS-F11) TO STDEPO 
+     MOVE WS-ARRTIME(WS-F11) TO STLANO 
+     MOVE WS-FLIGHTNUM(WS-F11) TO SFLIIDO 
+     MOVE WS-AIRPORTDEP(WS-F11) TO SDAIRO 
+     MOVE WS-AIRPORTARR(WS-F11) TO SLAIRO 
+                                              

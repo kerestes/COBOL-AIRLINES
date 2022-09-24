@@ -1,0 +1,937 @@
+**************************************************************** 
+* PROGRAM NAME                 : SRCHFLY                       * 
+* IMPORTANT FILE               : DB2 TABLE FLIGHT              * 
+* PROGRAMMER                   : KERESTES                      * 
+* DATE OF WRITEN               : SEPT. 2022                    * 
+* TECHNOLOGY                   : CICS + COBOL + DB2            * 
+**************************************************************** 
+*                   PROBLEM  DEFINITION                        * 
+*                                                              * 
+* SEARCH A FLIGHT ACCORDING TO INFORMATIONS ENTRED BY THE USER * 
+**************************************************************** 
+* INPUT PARAMETERS:                                            * 
+*                                                              * 
+* FLIGHTNUM, DEPARTURE AIRPORT, ARRIVAL AIRPORT, DATE          * 
+**************************************************************** 
+* OUTPUT PARAMETERS:                                           * 
+*                                                              * 
+* FLIGHT AVAIBLES ACCORDING TO THE REASEARCH                   * 
+**************************************************************** 
+                                                                  
+**************************************************************** 
+*                  IDENTIFICATION DIVISION.                    * 
+**************************************************************** 
+                                                                  
+ IDENTIFICATION DIVISION. 
+ PROGRAM-ID. SRCHFLY. 
+                                                                  
+**************************************************************** 
+*                       DATA DIVISION.                         * 
+**************************************************************** 
+                                                                  
+ DATA DIVISION. 
+                                                                  
+*------------------------* 
+ WORKING-STORAGE SECTION. 
+*------------------------*                                              
+                                                                        
+***************************************************************         
+*                      MAPS CICS COPY                         *         
+***************************************************************         
+                                                                        
+ COPY SRCHFLI.                                                          
+ COPY DFHAID.                                                           
+ COPY DFHBMSCA.                                                         
+                                                                        
+*****************************************************************       
+*                       SQL DECLARATION                         *       
+*****************************************************************       
+                                                                        
+     EXEC SQL                                                           
+         INCLUDE FLIGHT                                                 
+     END-EXEC.                                                          
+                                                                        
+     EXEC SQL                                                           
+         INCLUDE SQLCA                                                  
+     END-EXEC.                                                          
+                                                                        
+*****************************************************************       
+*                          SQL CURSORS                          *       
+*****************************************************************       
+                                                                        
+*----*                                                                  
+*CSR1*                                                                  
+*----*                                                                  
+                                                                        
+     EXEC SQL                                                           
+         DECLARE CSR1 CURSOR FOR                                        
+         SELECT FLIGHTDATE, DEPTIME, ARRTIME, TOTPASS,                  
+                FLIGHTNUM, AIRPORTDEP, AIRPORTARR                       
+         FROM FLIGHT                                                    
+         WHERE FLIGHTDATE >= :WS-EDIT-DATE AND FLIGHTNUM > :FNUMI       
+         FOR FETCH ONLY                                              
+     END-EXEC                                                        
+                                                                     
+*-----*                                                              
+*CSR10*                                                              
+*-----*                                                              
+                                                                     
+     EXEC SQL                                                        
+         DECLARE CSR10 CURSOR FOR                                    
+         SELECT FLIGHTDATE, DEPTIME, ARRTIME, TOTPASS,               
+                FLIGHTNUM, AIRPORTDEP, AIRPORTARR                    
+         FROM FLIGHT                                                 
+         WHERE FLIGHTDATE = :FDATEI                                  
+         FOR FETCH ONLY                                              
+     END-EXEC                                                        
+                                                                     
+*-----*                                                              
+*CSR11*                                                              
+*-----*                                                              
+                                                                     
+     EXEC SQL                                                        
+         DECLARE CSR11 CURSOR FOR                                    
+         SELECT FLIGHTDATE, DEPTIME, ARRTIME, TOTPASS,               
+                FLIGHTNUM, AIRPORTDEP, AIRPORTARR                    
+         FROM FLIGHT                                                 
+         WHERE FLIGHTDATE = :FDATEI AND FLIGHTNUM = :FNUMI           
+         FOR FETCH ONLY                                              
+     END-EXEC                                                        
+                                                                     
+*------*                                                             
+*CSR100*                                                             
+*------*                                                             
+                                                                     
+     EXEC SQL                                                        
+         DECLARE CSR100 CURSOR FOR                                   
+         SELECT FLIGHTDATE, DEPTIME, ARRTIME, TOTPASS,               
+                FLIGHTNUM, AIRPORTDEP, AIRPORTARR                   
+         FROM FLIGHT                                                
+         WHERE FLIGHTDATE = :FDATEI AND AIRPORTDEP = :DAIRI         
+         FOR FETCH ONLY                                             
+     END-EXEC                                                       
+                                                                    
+*-------*                                                           
+*CSR1000*                                                           
+*-------*                                                           
+                                                                    
+     EXEC SQL                                                       
+         DECLARE CSR1000 CURSOR FOR                                 
+         SELECT FLIGHTDATE, DEPTIME, ARRTIME, TOTPASS,              
+                FLIGHTNUM, AIRPORTDEP, AIRPORTARR                   
+         FROM FLIGHT                                                
+         WHERE FLIGHTDATE = :FDATEI AND AIRPORTARR = :LAIRI         
+         FOR FETCH ONLY                                             
+     END-EXEC                                                       
+                                                                    
+*-------*                                                           
+*CSR1100*                                                           
+*-------*                                                           
+                                                                    
+     EXEC SQL                                                       
+         DECLARE CSR1100 CURSOR FOR                                 
+         SELECT FLIGHTDATE, DEPTIME, ARRTIME, TOTPASS,              
+                FLIGHTNUM, AIRPORTDEP, AIRPORTARR                   
+         FROM FLIGHT                                                
+         WHERE FLIGHTDATE = :FDATEI AND AIRPORTDEP = :DAIRI AND     
+                                 AIRPORTARR = :LAIRI                
+         FOR FETCH ONLY                                             
+     END-EXEC                                                       
+                                                                    
+****************************************************************    
+*                   TABLE CICS WS DECLARATION.                 *    
+****************************************************************    
+                                                              
+ 01  WS-FLAG-DATE                    PIC X VALUE 'Y'. 
+                                                              
+ 01  WS-COMMAREA 
+     02 WS-TRANS                     PIC X(4). 
+     02 WS-USER-ID                   PIC X(8). 
+     02 WS-TERMINAL                  PIC X(8). 
+                                                              
+ 01  WS-TABLE. 
+     02 WS-FLYDT                     PIC X(10). 
+     02 WS-FLYTD                     PIC X(8). 
+     02 WS-FLYTL                     PIC X(8). 
+     02 WS-FLYPL                     PIC S9(9) USAGE COMP. 
+     02 WS-FLYNUM                    PIC X(6). 
+     02 WS-FLYDE                     PIC X(4). 
+     02 WS-FLYLD                     PIC X(4). 
+                                                              
+ 01  WS-CURRENT-DATE. 
+     02 WS-DATE. 
+        03 WS-YEAR                      PIC 9(4). 
+        03 WS-MONTH                     PIC 9(2). 
+        03 WS-DAY                       PIC 9(2). 
+     02 WS-TIME. 
+        03 WS-HOUR                      PIC 9(2). 
+        03 WS-MINUTE                    PIC 9(2). 
+        03 WS-SECOND                    PIC 9(2). 
+                                                              
+ 01  WS-EDIT-DATE                       PIC X(10). 
+                                                              
+ 01  WS-EDIT-DATE-R REDEFINES WS-EDIT-DATE. 
+     02 YEAR                            PIC 9(4). 
+     02 DASH1                           PIC X. 
+     02 MONTH                           PIC 9(2). 
+     02 DASH2                           PIC X. 
+     02 DAYS                            PIC 9(2). 
+                                                              
+ 01  WS-EDIT-DATE2                      PIC X(10). 
+                                                                 
+ 01  WS-EDIT-DATE2-R REDEFINES WS-EDIT-DATE2. 
+     02 2-DAYS                          PIC 9(2). 
+     02 2-DASH1                         PIC X. 
+     02 2-MONTH                         PIC 9(2). 
+     02 2-DASH2                         PIC X. 
+     02 2-YEAR                          PIC 9(4). 
+                                                                 
+ 01  WS-EDIT-HOUR                       PIC X(8). 
+                                                                 
+ 01  WS-EDIT-HOUR-R REDEFINES WS-EDIT-HOUR. 
+     02 H-HOUR                          PIC 9(2). 
+     02 H-DASH1                           PIC X. 
+     02 H-MIN                           PIC 9(2). 
+     02 H-DASH2                           PIC X. 
+     02 H-SEC                           PIC 9(2). 
+                                                                 
+*****************************************************************
+*                           COUNTERS                            *
+*****************************************************************
+                                                                 
+ 01  COUNT1                             PIC 9(4) VALUE ZEROS. 
+ 01  COUNT2                             PIC 9(2). 
+ 01  COUNT3                             PIC 9(2). 
+                                                                 
+*----------------* 
+ LINKAGE SECTION. 
+*----------------* 
+                                                                 
+ 01  DFHCOMMAREA. 
+     02 TRANSACTION     PIC X(4). 
+     02 USER-ID         PIC X(8). 
+                                                                 
+*****************************************************************
+*                      PROCEDURE DIVISION                       *
+***************************************************************** 
+                                                                  
+ PROCEDURE DIVISION. 
+                                                                  
+***************************************************************** 
+* MAIN-PARA.                                                    * 
+*                                                               * 
+* THIS PROGRAM WORKS WITH A PSEUDO-CONVERSATION METHOD.         * 
+* THE MAIN PARAGRAPH SET THE PROCEDURE FLOW WHICH CONTROLS THE  * 
+* SRCHLI MAP.                                                   * 
+***************************************************************** 
+                                                                  
+ MAIN-PARA. 
+                                                                  
+     IF EIBCALEN = 0 
+         MOVE 'INSERT THE DATA TO DO A RESEARCH' TO MSG1O 
+         PERFORM 0100-GET-DFHCOMMAREA 
+         PERFORM 0200-GET-TIME 
+         PERFORM 0210-GIVING-TIME 
+         PERFORM 0300-SEND-MAP 
+         PERFORM 0400-RETURN-CICS 
+     ELSE 
+         MOVE SPACE TO MSG1O 
+         MOVE SPACE TO MSG2O 
+         PERFORM 0410-MOVE-SPACE 
+         PERFORM 0500-RECEIVE-MAP 
+         PERFORM 0100-GET-DFHCOMMAREA 
+         PERFORM 0510-VERIFY-EIBAID 
+         PERFORM 0600-PROCESS-RESEARCH 
+         PERFORM 0200-GET-TIME 
+         PERFORM 0210-GIVING-TIME 
+         PERFORM 0300-SEND-MAP 
+         PERFORM 0400-RETURN-CICS 
+     END-IF. 
+                                                                  
+*************************************************************** 
+* 0100-GET-DFHCOMMAREA                                        *      
+*                                                             *      
+* MOVE USER-ID FROM DFHCOMMAREA TO WS-USERID.                 *      
+***************************************************************      
+                                                                     
+ 0100-GET-DFHCOMMAREA.                                               
+                                                                     
+     MOVE USER-ID TO WS-USER-ID                                      
+     MOVE EIBTRMID TO WS-TERMINAL.                                   
+                                                                     
+***************************************************************      
+* 0200-GET-TIME.                                              *      
+*                                                             *      
+* FOR GET THE TIME WE CAN UTILISE THE CICS METHOD OR THE COBOL*      
+* METHOD IF THE FUNCTION CURRENT-TIME. BUT HERE WE CHOSE THE  *      
+* THE CICS METHOD.                                            *      
+***************************************************************      
+                                                                     
+ 0200-GET-TIME.                                                      
+                                                                     
+     MOVE FUNCTION CURRENT-DATE(1:14) TO WS-CURRENT-DATE.            
+     MOVE WS-YEAR TO 2-YEAR                                          
+     MOVE WS-MONTH TO 2-MONTH                                        
+     MOVE WS-DAY TO 2-DAYS                                           
+     MOVE '/' TO 2-DASH1                                             
+     MOVE '/' TO 2-DASH2                                             
+                                                                     
+     MOVE WS-YEAR TO YEAR                                            
+     MOVE WS-MONTH TO MONTH                                          
+     MOVE WS-DAY TO DAYS                                             
+     MOVE '-' TO DASH1                                               
+     MOVE '-' TO DASH2                                               
+                                                                     
+     MOVE WS-HOUR TO H-HOUR                                          
+     MOVE WS-MINUTE TO H-MIN                                         
+     MOVE WS-SECOND TO H-SEC                                         
+     MOVE ':' TO H-DASH1 
+     MOVE ':' TO H-DASH2. 
+                                                                  
+*************************************************************** 
+* 0210-GIVING-TIME.                                           * 
+*                                                             * 
+* AFTER GETTING THE TIME ITS NECESSARY TO TRANSFER THIS INFO  * 
+* TO THE LOGIN MAP ITSELF                                     * 
+*************************************************************** 
+                                                                  
+ 0210-GIVING-TIME. 
+                                                                  
+     MOVE WS-EDIT-HOUR TO LHOURO 
+     MOVE WS-EDIT-DATE2 TO LDATEO. 
+                                                                  
+*************************************************************** 
+* 0300-SEND-MAP.                                              * 
+*                                                             * 
+* SEND MAP PROCEDURE IS IMPORTANTE TO CHANGE INFORMATIONS WITH* 
+* THE USER AND IN THE PSEUDO CONVERSATION METHOD.             * 
+*************************************************************** 
+                                                                  
+ 0300-SEND-MAP. 
+                                                                  
+     MOVE WS-USERID TO USERIDO 
+     MOVE WS-TERINAL TO TERMO 
+                                                                  
+     EXEC CICS 
+         SEND MAP('SRCHPA')  MAPSET('SRCHFLI') ERASE 
+     END-EXEC. 
+                                                                  
+*************************************************************** 
+* 0400-RETURN-CICS.                                           * 
+*                                                             * 
+* RETURN LETS THE PROGRAM FREE TO RECEIVE OTHER INFORMATIONS  * 
+* FROM ANOTHER USERS.                                         * 
+* THE COMMUNICATION-AREA IS USED TO SEND INFORMATION BETWEEN  * 
+* MAPS.                                                       * 
+*************************************************************** 
+                                                                  
+ 0400-RETURN-CICS. 
+                                                                  
+     MOVE WS-USERID TO USER-ID 
+                                                                  
+     EXEC CICS 
+         RETURN TRANSID ('SCHF') 
+         COMMAREA(WS-COMMAREA) 
+     END-EXEC. 
+                                                                  
+*************************************************************** 
+* 0410-MOVE-SPACE                                             * 
+*                                                             * 
+* IT MOVE SPACE TO THE MAP'S VARIABLES. IT IS IMPORTANTE TO   * 
+* VERIFY IF ANY INFORMATION WAS INSERT IN IT.                 * 
+*************************************************************** 
+                                                                  
+ 0410-MOVE-SPACE. 
+                                                                  
+     MOVE SPACE TO FNUMI 
+     MOVE SPACE TO DAIRI 
+     MOVE SPACE TO LAIRI. 
+                                                                  
+*************************************************************** 
+* 0500-RECEIVE-MAP.                                           * 
+*                                                             * 
+* IT RECEIVES THE USER INFORMATION TO BE PROCESSED            * 
+*************************************************************** 
+                                                                  
+ 0500-RECEIVE-MAP. 
+                                                                  
+     EXEC CICS 
+         RECEIVE MAP('SRCHPA')  MAPSET('SRCHFLI') 
+     END-EXEC. 
+                                                                
+*************************************************************** 
+* 0510-VERIFY-EIBAID                                          * 
+*                                                             * 
+* IT CHECKS IF THE USER PRESS ANY FKEY WHICH IS REALATED WITH * 
+* ANOTHER MAP OR FUNCTION.                                    * 
+*************************************************************** 
+                                                                
+ 0510-VERIFY-EIBAID. 
+                                                                
+     EVALUATE EIBAID 
+        WHEN DFHPF3 
+                                                                
+            EXEC CICS XCTL 
+               PROGRAM('LOGIN') 
+               COMMAREA(WS-COMMAREA) 
+               LENGTH(12) 
+            END-EXEC 
+                                                                
+        WHEN DFHPF4 
+                                                                
+            MOVE 'THIS IS THE CURRENT MAP' TO MSG1O 
+                                                                
+        WHEN DFHPF5 
+                                                                
+            EXEC CICS XCTL 
+               PROGRAM('SRCHTKT') 
+               COMMAREA(WS-COMMAREA) 
+               LENGTH(12) 
+            END-EXEC 
+                                                                
+        WHEN DFHPF6 
+                                                                
+            MOVE 'THIS MAP IS NOT READY YET' TO MSG1O 
+                                                                
+        WHEN DFHPF7 
+                                                                 
+            MOVE 'THIS MAP IS NOT READY YET' TO MSG1O 
+                                                                 
+     END-EVALUATE. 
+                                                                 
+*************************************************************** 
+* 0600-PROCESS-RESEARCH                                       * 
+*                                                             * 
+* THE PROGRAM WILL ANALYZE WHICH INFORMATION THE USER PROVIDES* 
+* AND WILL UTILISE THE CORRESPONDING CURSOR                   * 
+*************************************************************** 
+                                                                 
+ 0600-PROCESS-RESEARCH. 
+                                                                 
+     PERFORM 0610-GET-INFORMATION 
+     PERFORM 0620-SELECT-DB2INFO. 
+                                                                 
+*****************************************************************
+* 0610-GET-INFORMATION.                                         *
+*                                                               *
+* IT GETS THE INFORMATION FROM THE USER FROM CICS               *
+*****************************************************************
+                                                                 
+ 0610-GET-INFORMATION. 
+                                                                 
+     MOVE ZEROS TO COUNT1 
+                                                                 
+     IF FNUMI NOT = SPACE 
+        ADD 1 TO COUNT1 
+     END-IF 
+                                                                 
+     IF FDATEI NOT = SPACE AND FDATEI NOT = 'YYYY-MM-DD' 
+        ADD 10 TO COUNT1 
+     END-IF 
+                                                                 
+     IF DAIRI(2:1) NOT = SPACE AND COUNT1(4:1) = ZERO 
+        ADD 100 TO COUNT1 
+     END-IF 
+                                                                  
+     IF LAIRI (2:1) NOT = SPACE AND COUNT1(4:1) = ZERO 
+        ADD 1000 TO COUNT1 
+     END-IF. 
+                                                                  
+***************************************************************** 
+* 0620-SELECT-DB2INFO.                                          * 
+*                                                               * 
+* IT GETS THE DB2 DATA ACCORDING THE INFO INSERT BY USER        * 
+* 1 = FLIGHTNUM                                                 * 
+* 10 = DATE                                                     * 
+* 11 = DATE AND FLIGHNUM                                        * 
+* 100 = DEPARTURE AIRPORT                                       * 
+* 110 = DEPARTURE AIRPORT AND DATE                              * 
+* 1000 = ARRIVAL AIRPORT                                        * 
+* 1010 = AARRIVAL AIRPORT AND DATE                              * 
+* 1100 = DEPARTURE AIRPORT AND ARRIVAL AIRPORT                  * 
+* 1110 = DEPARTURE AIRPORT AND ARRIVAL AIRPORT AND DATE         * 
+***************************************************************** 
+                                                                  
+ 0620-SELECT-DB2INFO. 
+                                                                  
+     EVALUATE COUNT1 
+                                                                  
+        WHEN 1 
+            PERFORM 0621-SQL-FNUM 
+                                                                  
+        WHEN 10 
+            PERFORM 0800-VERIFY-DATE 
+            PERFORM 0622-SQL-FDATE 
+                                                                  
+        WHEN 11 
+            PERFORM 0623-SQL-FNUM-FDATE 
+                                                                     
+        WHEN 100                                                     
+            MOVE WS-EDIT-DATE TO FDATE                               
+            PERFORM 0624 SQL-DAIR                                    
+                                                                     
+        WHEN 110                                                     
+            PERFORM 0800-VERIFY-DATE                                 
+            PERFORM 0624-SQL-DAIR                                    
+                                                                     
+        WHEN 1000                                                    
+            MOVE WS-EDIT-DATE TO FDATE                               
+            PERFORM 0625-SQL-LAIR                                    
+                                                                     
+        WHEN 1010                                                    
+            PERFORM 0800-VERIFY-DATE                                 
+            PERFORM 0625-SQL-LAIR                                    
+                                                                     
+        WHEN 1100                                                    
+            MOVE WS-EDIT-DATE TO FDATE                               
+            PERFORM 0626-SQL-LAIR-DAIR                               
+                                                                     
+        WHEN 1110                                                    
+            PERFORM 0800-VERIFY-DATE                                 
+            PERFORM 0626-SQL-LAIR-DAIR                               
+                                                                     
+        WHEN 0                                                       
+            MOVE 'NO DATA INSERT, TRY AGAIN' TO MSG1O                
+                                                                     
+     END-EVALUATE.                                                   
+                                                                     
+*****************************************************************    
+* 0621-SQL-FNUM                                                 *    
+*                                                               *    
+* IT TAKES THE FLIGHT INFROMATION FROM FLIGHTNUMBER             *    
+*****************************************************************    
+                                                                     
+ 0621-SQL-FNUM. 
+                                                                  
+***************************************************************** 
+* IT OPENS THE CURSOR SQL CSR1                                  * 
+***************************************************************** 
+                                                                  
+     EXEC SQL 
+         OPEN CSR1 
+     END-EXEC 
+                                                                  
+***************************************************************** 
+                                                                  
+     PERFORM VARYING COUNT2 FROM 1 BY 1 UNTIL COUNT2 > 10 OR 
+                      SQLCODE NOT = 0 OR WS-FLAG-DATE = 'N' 
+                                                                  
+        EXEC SQL 
+            FETCH CSR1 
+            INTO :WS-FLYDT, :WS-FLYTD, :WS-FLYTL, :WS-FLYPL, 
+                 :WS-FLYNUM, :WS-FLYDE, :WS-FLYLD 
+        END-EXEC 
+                                                                  
+        EVALUATE SQLCODE 
+          WHEN 0 
+             PERFORM 0630-MOVE-INFO 
+          WHEN 100 
+             CONTINUE 
+          WHEN OTHER 
+             PERFORM 0700-SQL-ERROR 
+             CONTINUE 
+        END-EVALUATE 
+                                                                  
+     END-PERFORM 
+                                                                  
+     MOVE 'Y' TO WS-FLAG-DATE 
+                                                                  
+***************************************************************** 
+* IT CLOSE THE DB2 CURSOR CSR1                                  * 
+***************************************************************** 
+                                                                  
+     EXEC SQL 
+         CLOSE CSR1 
+     END-EXEC. 
+                                                                  
+***************************************************************** 
+* 0622-SQL-FDATE.                                               * 
+*                                                               * 
+* IT TAKES THE FLIGHT INFROMATION FROM THE DATE                 * 
+***************************************************************** 
+                                                                  
+ 0622-SQL-FDATE. 
+                                                                  
+***************************************************************** 
+*  IT OPENS THE DB2 CURSOR CSR10                                * 
+***************************************************************** 
+                                                                  
+      EXEC SQL 
+          OPEN CSR10 
+      END-EXEC 
+                                                                  
+***************************************************************** 
+                                                                  
+     PERFORM VARYING COUNT2 FROM 1 BY 1 UNTIL COUNT2 > 10 OR 
+                            SQLCODE NOT = 0 OR WS-FLAG-DATE = 'N' 
+                                                                  
+        EXEC SQL 
+            FETCH CSR10 
+            INTO :WS-FLYDT, :WS-FLYTD, :WS-FLYTL, :WS-FLYPL, 
+                 :WS-FLYNUM, :WS-FLYDE, :WS-FLYLD 
+        END-EXEC 
+                                                                  
+        EVALUATE SQLCODE 
+          WHEN 0 
+             PERFORM 0630-MOVE-INFO                                  
+          WHEN 100                                                   
+             CONTINUE                                                
+          WHEN OTHER                                                 
+             PERFORM 0700-SQL-ERROR                                  
+             CONTINUE                                                
+        END-EVALUATE                                                 
+                                                                     
+     END-PERFORM                                                     
+                                                                     
+     MOVE 'Y' TO WS-FLAG-DATE                                        
+                                                                     
+*****************************************************************    
+* IT CLOSES THE DB2 CURSOR CSR10                                *    
+*****************************************************************    
+                                                                     
+     EXEC SQL                                                        
+         CLOSE CSR10                                                 
+     END-EXEC.                                                       
+                                                                     
+*****************************************************************    
+* 0623-SQL-FNUM-FDATE                                           *    
+*                                                               *    
+* IT TAKES THE FLIGHT INFROMATION FROM THE FLIGHTNUMBER AND DATE*    
+*****************************************************************    
+                                                                     
+ 0623-SQL-FNUM-FDATE.                                                
+                                                                     
+*****************************************************************    
+*  IT OPENS THE DB2 CURSOR CSR11                                *    
+*****************************************************************    
+                                                                     
+      EXEC SQL                                                       
+          OPEN CSR11                                                 
+      END-EXEC                                                       
+                                                                     
+***************************************************************** 
+                                                                  
+     PERFORM VARYING COUNT2 FROM 1 BY 1 UNTIL COUNT2 > 10 OR 
+                           SQLCODE NOT = 0 OR WS-FLAG-DATE = 'N' 
+                                                                  
+        EXEC SQL 
+            FETCH CSR11 
+            INTO :WS-FLYDT, :WS-FLYTD, :WS-FLYTL, :WS-FLYPL, 
+                 :WS-FLYNUM, :WS-FLYDE, :WS-FLYLD 
+        END-EXEC 
+                                                                  
+        EVALUATE SQLCODE 
+          WHEN 0 
+             PERFORM 0630-MOVE-INFO 
+          WHEN 100 
+             CONTINUE 
+          WHEN OTHER 
+             PERFORM 0700-SQL-ERROR 
+             CONTINUE 
+        END-EVALUATE 
+                                                                  
+     END-PERFORM 
+                                                                  
+     MOVE 'Y' TO WS-FLAG-DATE 
+                                                                  
+***************************************************************** 
+* IT CLOSES THE DB2 CURSOR CSR11                                * 
+***************************************************************** 
+                                                                  
+     EXEC SQL 
+         CLOSE CSR11 
+     END-EXEC. 
+                                                                  
+***************************************************************** 
+* 0624-SQL-DAIR.                                                * 
+*                                                               * 
+* IT TAKES THE FLIGHT INFROMATION FROM DEPARTURE AIRPORT        *   
+*****************************************************************   
+                                                                    
+ 0624-SQL-DAIR.                                                     
+                                                                    
+*****************************************************************   
+*  IT OPENS THE DB2 CURSOR CSR100                               *   
+*****************************************************************   
+                                                                    
+     EXEC SQL                                                       
+         OPEN CSR100                                                
+     END-EXEC                                                       
+                                                                    
+*****************************************************************   
+                                                                    
+     PERFORM VARYING COUNT2 FROM 1 BY 1 UNTIL COUNT2 > 10 OR        
+                           SQLCODE NOT = 0 OR WS-FLAG-DATE = 'N'    
+                                                                    
+        EXEC SQL                                                    
+            FETCH CSR100                                            
+            INTO :WS-FLYDT, :WS-FLYTD, :WS-FLYTL, :WS-FLYPL,        
+                 :WS-FLYNUM, :WS-FLYDE, :WS-FLYLD                   
+        END-EXEC                                                    
+                                                                    
+        EVALUATE SQLCODE                                            
+          WHEN 0                                                    
+             PERFORM 0630-MOVE-INFO                                 
+          WHEN 100                                                  
+             CONTINUE                                               
+          WHEN OTHER                                                
+             PERFORM 0700-SQL-ERROR                                 
+             CONTINUE                                               
+        END-EVALUATE                                                
+                                                                    
+     END-PERFORM                                                    
+     MOVE 'Y' TO WS-FLAG-DATE                                       
+                                                                    
+*****************************************************************   
+* IT CLOSES THE DB2 CURSOR CSR100                               *   
+*****************************************************************   
+                                                                    
+     EXEC SQL                                                       
+         CLOSE CSR100                                               
+     END-EXEC.                                                      
+                                                                    
+*****************************************************************   
+* 0625-SQL-LAIR.                                                *   
+*                                                               *   
+* IT TAKES THE FLIGHT INFROMATION FROM LAND AIRPORT             *   
+*****************************************************************   
+                                                                    
+ 0625-SQL-LAIR.                                                     
+                                                                    
+*****************************************************************   
+*  IT OPENS THE DB2 CURSOR CSR1000                              *   
+*****************************************************************   
+                                                                    
+      EXEC SQL                                                      
+          OPEN CSR1000                                              
+      END-EXEC                                                      
+                                                                    
+*****************************************************************   
+                                                                    
+     PERFORM VARYING COUNT2 FROM 1 BY 1 UNTIL COUNT2 > 10 OR        
+                           SQLCODE NOT = 0 OR WS-FLAG-DATE = 'N'    
+                                                                    
+        EXEC SQL                                                    
+            FETCH CSR1000                                           
+            INTO :WS-FLYDT, :WS-FLYTD, :WS-FLYTL, :WS-FLYPL,        
+                 :WS-FLYNUM, :WS-FLYDE, :WS-FLYLD                   
+        END-EXEC                                                    
+                                                                  
+        EVALUATE SQLCODE 
+          WHEN 0 
+             PERFORM 0630-MOVE-INFO 
+          WHEN 100 
+             CONTINUE 
+          WHEN OTHER 
+             PERFORM 0700-SQL-ERROR 
+             CONTINUE 
+        END-EVALUATE 
+                                                                  
+     END-PERFORM 
+                                                                  
+     MOVE 'Y' TO WS-FLAG-DATE 
+                                                                  
+***************************************************************** 
+* IT CLOSES THE DB2 CURSOR CSR1100                              * 
+***************************************************************** 
+                                                                  
+     EXEC SQL 
+         CLOSE CSR1000 
+     END-EXEC. 
+                                                                  
+***************************************************************** 
+* 0626-SQL-LAIR-DAIR.                                           * 
+*                                                               * 
+* IT TAKES THE FLIGHT INFROMATION FROM LAND AND DEPARTURE       * 
+*                                         AIRPORTS              * 
+***************************************************************** 
+                                                                  
+ 0626-SQL-LAIR-DAIR. 
+                                                                  
+***************************************************************** 
+*  IT OPENS THE DB2 CURSOR CSR1100                              * 
+***************************************************************** 
+                                                                  
+      EXEC SQL 
+          OPEN CSR1100 
+      END-EXEC 
+                                                                  
+***************************************************************** 
+                                                                  
+     PERFORM VARYING COUNT2 FROM 1 BY 1 UNTIL COUNT2 > 10 OR 
+                           SQLCODE NOT = 0 OR WS-FLAG-DATE = 'N' 
+                                                                  
+        EXEC SQL 
+            FETCH CSR1100 
+            INTO :WS-FLYDT, :WS-FLYTD, :WS-FLYTL, :WS-FLYPL, 
+                 :WS-FLYNUM, :WS-FLYDE, :WS-FLYLD 
+        END-EXEC 
+                                                                  
+        EVALUATE SQLCODE 
+          WHEN 0 
+             PERFORM 0630-MOVE-INFO 
+          WHEN 100 
+             CONTINUE 
+          WHEN OTHER 
+             PERFORM 0700-SQL-ERROR 
+             CONTINUE 
+        END-EVALUATE 
+                                                                  
+     END-PERFORM 
+                                                                  
+     MOVE 'Y' TO WS-FLAG-DATE 
+                                                                  
+***************************************************************** 
+* IT CLOSES THE DB2 CURSOR CSR1100                              * 
+***************************************************************** 
+                                                                  
+     EXEC SQL 
+         CLOSE CSR1100 
+     END-EXEC. 
+                                                                  
+***************************************************************** 
+* 0630-MOVE-INFO                                                * 
+*                                                               * 
+* IT MOVE THE DATA FROM THE RECEIVED DB2 VARIABLES TO THE CICS  * 
+* MAP VARIABLES                                                 * 
+***************************************************************** 
+                                                                  
+ 0630-MOVE-INFO. 
+                                                                  
+     PERFORM VARYING COUNT3 FROM 1 BY 1 UNTIL COUNT3 > 10 
+                                                                  
+        EVALUATE COUNT3 
+           WHEN 1 
+                                                                  
+               MOVE WS-FLYNUM TO FLIID0O 
+               MOVE WS-FLYTD TO FLITD0O 
+               MOVE WS-FLYTL TO FLITL0O 
+               MOVE WS-FLYDE TO FLIDE0O 
+               MOVE WS-FLYLD TO FLILD0O 
+               MOVE WS-FLYPL TO FLIPL0O 
+               MOVE WS-FLYDT TO FLIDT0O 
+                                                                  
+           WHEN 2 
+                                                                  
+               MOVE WS-FLYNUM TO FLIID1O 
+               MOVE WS-FLYTD TO FLITD1O 
+               MOVE WS-FLYTL TO FLITL1O 
+               MOVE WS-FLYDE TO FLIDE1O 
+               MOVE WS-FLYLD TO FLILD1O 
+               MOVE WS-FLYPL TO FLIPL1O 
+               MOVE WS-FLYDT TO FLIDT1O 
+                                                                  
+           WHEN 3 
+                                                                  
+               MOVE WS-FLYNUM TO FLIID2O 
+               MOVE WS-FLYTD TO FLITD2O 
+               MOVE WS-FLYTL TO FLITL2O 
+               MOVE WS-FLYDE TO FLIDE2O 
+               MOVE WS-FLYLD TO FLILD2O 
+               MOVE WS-FLYPL TO FLIPL2O 
+               MOVE WS-FLYDT TO FLIDT2O 
+                                                                
+           WHEN 4 
+                                                                
+               MOVE WS-FLYNUM TO FLIID3O 
+               MOVE WS-FLYTD TO FLITD3O 
+               MOVE WS-FLYTL TO FLITL3O 
+               MOVE WS-FLYDE TO FLIDE3O 
+               MOVE WS-FLYLD TO FLILD3O 
+               MOVE WS-FLYPL TO FLIPL3O 
+               MOVE WS-FLYDT TO FLIDT3O 
+                                                                
+           WHEN 5 
+                                                                
+               MOVE WS-FLYNUM TO FLIID4O 
+               MOVE WS-FLYTD TO FLITD4O 
+               MOVE WS-FLYTL TO FLITL4O 
+               MOVE WS-FLYDE TO FLIDE4O 
+               MOVE WS-FLYLD TO FLILD4O 
+               MOVE WS-FLYPL TO FLIPL4O 
+               MOVE WS-FLYDT TO FLIDT4O 
+                                                                
+           WHEN 6 
+                                                                
+               MOVE WS-FLYNUM TO FLIID5O 
+               MOVE WS-FLYTD TO FLITD5O 
+               MOVE WS-FLYTL TO FLITL5O 
+               MOVE WS-FLYDE TO FLIDE5O 
+               MOVE WS-FLYLD TO FLILD5O 
+               MOVE WS-FLYPL TO FLIPL5O 
+               MOVE WS-FLYDT TO FLIDT5O 
+                                                               
+           WHEN 7 
+                                                               
+               MOVE WS-FLYNUM TO FLIID6O 
+               MOVE WS-FLYTD TO FLITD6O 
+               MOVE WS-FLYTL TO FLITL6O 
+               MOVE WS-FLYDE TO FLIDE6O 
+               MOVE WS-FLYLD TO FLILD6O 
+               MOVE WS-FLYPL TO FLIPL6O 
+               MOVE WS-FLYDT TO FLIDT6O 
+                                                               
+           WHEN 8 
+                                                               
+               MOVE WS-FLYNUM TO FLIID7O 
+               MOVE WS-FLYTD TO FLITD7O 
+               MOVE WS-FLYTL TO FLITL7O 
+               MOVE WS-FLYDE TO FLIDE7O 
+               MOVE WS-FLYLD TO FLILD7O 
+               MOVE WS-FLYPL TO FLIPL7O 
+               MOVE WS-FLYDT TO FLIDT7O 
+                                                               
+           WHEN 9 
+                                                               
+               MOVE WS-FLYNUM TO FLIID8O 
+               MOVE WS-FLYTD TO FLITD8O 
+               MOVE WS-FLYTL TO FLITL8O 
+               MOVE WS-FLYDE TO FLIDE8O 
+               MOVE WS-FLYLD TO FLILD8O 
+               MOVE WS-FLYPL TO FLIPL8O 
+               MOVE WS-FLYDT TO FLIDT8O 
+                                                               
+           WHEN 10 
+                                                               
+               MOVE WS-FLYNUM TO FLIID9O 
+               MOVE WS-FLYTD TO FLITD9O 
+               MOVE WS-FLYTL TO FLITL9O 
+               MOVE WS-FLYDE TO FLIDE9O                              
+               MOVE WS-FLYLD TO FLILD9O                              
+               MOVE WS-FLYPL TO FLIPL9O                              
+               MOVE WS-FLYDT TO FLIDT9O.                             
+                                                                     
+****************************************************************     
+* 0700-SQL-ERROR.                                              *     
+*                                                              *     
+* IT SENDS THE SQLCODE AND SQLSTATE TO THE USER, IF IT OCCURS  *     
+****************************************************************     
+                                                                     
+ 0700-SQL-ERROR.                                                     
+                                                                     
+     MOVE 'DB2 ERROR, CALL THE IT DEPARTMENT' TO MSG1O               
+     MOVE 'INFROM THE ERROR: ' TO MSG2O                              
+     MOVE SQLCODE TO MSG2O(20:10)                                    
+     MOVE 'AND' TO MSG2O(31:3)                                       
+     MOVE SQLSTATE TO MSG2O (35:10).                                 
+                                                                     
+****************************************************************     
+* 0800-VERIFY-DATE.                                            *     
+*                                                              *     
+* TO MINIMIZE THE ERRORS, THIS PARAGRAPH VERIFY THE DATE FORMAT*     
+* IF IT'S NOT ACCORDING WITH THE DB2 EXIGENCY THE PROGRAM SEND *     
+* A MESSAGE TO THE USER AND DOES NOT ALLOW A SQL ERROR         *     
+****************************************************************     
+                                                                     
+ 0800-VERIFY-DATE.                                                   
+                                                                     
+     IF FDATEI(1:4) NOT NUMERIC OF FDATEI(6:2) NOT NUMERIC OR        
+                                   FDATEI(9:2) NOT NUMERIC           
+        MOVE 'N' TO WS-FLAG-DATE                                     
+     ELSE                                                            
+     IF FDATEI(5:1) NOT = '-' OR FDATEI(7:1) NOT = '-'               
+        MOVE 'N' TO WS-FLAG-DATE                                     
+     END-IF                                                          
+                                                                  
+     MOVE 'WRONG DATE FORMAT, TRY TO INSERT DATE AS YYYY-MM-DD' TO
+                                                MSG1O. 

@@ -1,0 +1,204 @@
+SRCHFLI  DFHMSD TYPE=SYSPARM,MODE=INOUT,LANG=COBOL,STORAGE=AUTO,       X
+                CTRL=(FREEKB,FRSET),TIOAPFX=YES,DSATTS=(COLOR,HILIGHT),X
+                MAPATTS=(COLOR,HILIGHT)                                 
+SRCHPA   DFHMDI SIZE=(24,80),LINE=1,COLUMN=1                            
+         DFHMDF POS=(1,1),LENGTH=80,ATTRB=PROT,COLOR=BLUE,             X
+                INITIAL='**********************************************X
+               *********************************'                       
+         DFHMDF POS=(2,1),LENGTH=10,ATTRB=PROT,COLOR=BLUE,             X
+                INITIAL='USERID:   '                                    
+USERID   DFHMDF POS=(2,11),LENGTH=8,ATTRB=PROT,COLOR=BLUE               
+         DFHMDF POS=(2,31),LENGTH=14,ATTRB=PROT,COLOR=YELLOW,          X
+                INITIAL='COBOL AIRLINES'                                
+         DFHMDF POS=(2,64),LENGTH=6,ATTRB=PROT,COLOR=BLUE,             X
+                INITIAL='DATE: '                                        
+LDATE    DFHMDF POS=(2,70),LENGTH=10,ATTRB=PROT,COLOR=BLUE              
+         DFHMDF POS=(3,1),LENGTH=10,ATTRB=PROT,COLOR=BLUE,             X
+                INITIAL='TERMINAL: '                                    
+TERM     DFHMDF POS=(3,11),LENGTH=8,ATTRB=PROT,COLOR=BLUE               
+         DFHMDF POS=(3,27),LENGTH=22,ATTRB=PROT,COLOR=YELLOW,          X
+                INITIAL='PROGRAMMING AT HEIGHTS'                        
+         DFHMDF POS=(3,64),LENGTH=6,ATTRB=PROT,COLOR=BLUE,             X
+                INITIAL='TIME: '                                        
+LHOUR    DFHMDF POS=(3,70),LENGTH=10,ATTRB=PROT,COLOR=BLUE              
+         DFHMDF POS=(4,1),LENGTH=80,ATTRB=PROT,COLOR=BLUE,             X
+                INITIAL='**********************************************X
+               *********************************'                       
+         DFHMDF POS=(5,31),LENGTH=13,ATTRB=PROT,COLOR=WHITE            X
+                INITIAL='SEARCH FLIGHT'                                 
+         DFHMDF POS=(7,30),LENGTH=44,ATTRB=PROT,COLOR=BLUE             X
+                INITIAL='  FID   TDEP  TLAND  DEP  LAND  PLACES  DATE'  
+         DFHMDF POS=(8,2),LENGTH=12,ATTRB=PROT,COLOR=WHITE,            X
+                INITIAL='FLIGHT NUM: '                                  
+FNUM     DFHMDF POS=(8,14),LENGTH=6,ATTRB=(IC,FSET,UNPROT),            X
+                COLOR=WHITE,HILIGHT=UNDERLINE                           
+         DFHMDF POS=(8,21),LENGTH=1,ATTRB=ASKIP                         
+FLIID0   DFHMDF POS=(9,31),LENGTH=6,ATTRB=PROT,COLOR=PINK               
+         DFHMDF POS=(9,38),LENGTH=1,ATTRB=ASKIP                         
+FLITD0   DFHMDF POS=(9,38),LENGTH=5,ATTRB=PROT,COLOR=PINK               
+         DFHMDF POS=(9,44),LENGTH=1,ATTRB=ASKIP                         
+FLITL0   DFHMDF POS=(9,44),LENGTH=5,ATTRB=PROT,COLOR=PINK               
+         DFHMDF POS=(9,50),LENGTH=1,ATTRB=ASKIP                         
+FLIDE0   DFHMDF POS=(9,51),LENGTH=3,ATTRB=PROT,COLOR=PINK               
+         DFHMDF POS=(9,55),LENGTH=1,ATTRB=ASKIP                         
+FLILD0   DFHMDF POS=(9,56),LENGTH=3,ATTRB=PROT,COLOR=PINK               
+         DFHMDF POS=(9,60),LENGTH=1,ATTRB=ASKIP                         
+FLIPL0   DFHMDF POS=(9,62),LENGTH=3,ATTRB=PROT,COLOR=PINK               
+         DFHMDF POS=(9,66),LENGTH=1,ATTRB=ASKIP                         
+FLIDT0   DFHMDF POS=(9,67),LENGTH=10,ATTRB=PROT,COLOR=PINK              
+         DFHMDF POS=(9,78),LENGTH=1,ATTRB=ASKIP                         
+FLIID1   DFHMDF POS=(10,31),LENGTH=6,ATTRB=PROT,COLOR=PINK              
+         DFHMDF POS=(10,38),LENGTH=1,ATTRB=ASKIP                        
+FLITD1   DFHMDF POS=(10,38),LENGTH=5,ATTRB=PROT,COLOR=PINK              
+         DFHMDF POS=(10,44),LENGTH=1,ATTRB=ASKIP                        
+FLITL1   DFHMDF POS=(10,44),LENGTH=5,ATTRB=PROT,COLOR=PINK              
+         DFHMDF POS=(10,50),LENGTH=1,ATTRB=ASKIP                        
+FLIDE1   DFHMDF POS=(10,51),LENGTH=3,ATTRB=PROT,COLOR=PINK              
+         DFHMDF POS=(10,55),LENGTH=1,ATTRB=ASKIP                        
+FLILD1   DFHMDF POS=(10,56),LENGTH=3,ATTRB=PROT,COLOR=PINK              
+         DFHMDF POS=(10,60),LENGTH=1,ATTRB=ASKIP                        
+FLIPL1   DFHMDF POS=(10,62),LENGTH=3,ATTRB=PROT,COLOR=PINK              
+         DFHMDF POS=(10,66),LENGTH=1,ATTRB=ASKIP                        
+FLIDT1   DFHMDF POS=(10,67),LENGTH=10,ATTRB=PROT,COLOR=PINK             
+         DFHMDF POS=(10,78),LENGTH=1,ATTRB=ASKIP                        
+         DFHMDF POS=(11,2),LENGTH=06,ATTRB=PROT,COLOR=WHITE,           X
+                INITIAL='DATE: '                                        
+FDATE    DFHMDF POS=(11,10),LENGTH=10,ATTRB=(FSET,UNPROT),COLOR=WHITE, X
+                HILIGHT=UNDERLINE,INITIAL='YYYY-MM-DD'                  
+         DFHMDF POS=(11,21),LENGTH=1,ATTRB=ASKIP                        
+FLIID2   DFHMDF POS=(11,31),LENGTH=6,ATTRB=PROT,COLOR=PINK              
+         DFHMDF POS=(11,38),LENGTH=1,ATTRB=ASKIP                        
+FLITD2   DFHMDF POS=(11,38),LENGTH=5,ATTRB=PROT,COLOR=PINK              
+         DFHMDF POS=(11,44),LENGTH=1,ATTRB=ASKIP                        
+FLITL2   DFHMDF POS=(11,44),LENGTH=5,ATTRB=PROT,COLOR=PINK              
+         DFHMDF POS=(11,50),LENGTH=1,ATTRB=ASKIP                        
+FLIDE2   DFHMDF POS=(11,51),LENGTH=3,ATTRB=PROT,COLOR=PINK              
+         DFHMDF POS=(11,55),LENGTH=1,ATTRB=ASKIP                        
+FLILD2   DFHMDF POS=(11,56),LENGTH=3,ATTRB=PROT,COLOR=PINK              
+         DFHMDF POS=(11,60),LENGTH=1,ATTRB=ASKIP                        
+FLIPL2   DFHMDF POS=(11,62),LENGTH=3,ATTRB=PROT,COLOR=PINK              
+         DFHMDF POS=(11,66),LENGTH=1,ATTRB=ASKIP                        
+FLIDT2   DFHMDF POS=(11,67),LENGTH=10,ATTRB=PROT,COLOR=PINK             
+         DFHMDF POS=(11,78),LENGTH=1,ATTRB=ASKIP                        
+FLIID3   DFHMDF POS=(12,31),LENGTH=6,ATTRB=PROT,COLOR=PINK              
+         DFHMDF POS=(12,38),LENGTH=1,ATTRB=ASKIP                        
+FLITD3   DFHMDF POS=(12,38),LENGTH=5,ATTRB=PROT,COLOR=PINK              
+         DFHMDF POS=(12,44),LENGTH=1,ATTRB=ASKIP                        
+FLITL3   DFHMDF POS=(12,44),LENGTH=5,ATTRB=PROT,COLOR=PINK              
+         DFHMDF POS=(12,50),LENGTH=1,ATTRB=ASKIP                        
+FLIDE3   DFHMDF POS=(12,51),LENGTH=3,ATTRB=PROT,COLOR=PINK              
+         DFHMDF POS=(12,55),LENGTH=1,ATTRB=ASKIP                        
+FLILD3   DFHMDF POS=(12,56),LENGTH=3,ATTRB=PROT,COLOR=PINK              
+         DFHMDF POS=(12,60),LENGTH=1,ATTRB=ASKIP                        
+FLIPL3   DFHMDF POS=(12,62),LENGTH=3,ATTRB=PROT,COLOR=PINK              
+         DFHMDF POS=(12,66),LENGTH=1,ATTRB=ASKIP                        
+FLIDT3   DFHMDF POS=(12,67),LENGTH=10,ATTRB=PROT,COLOR=PINK             
+         DFHMDF POS=(12,78),LENGTH=1,ATTRB=ASKIP                        
+FLIID4   DFHMDF POS=(13,31),LENGTH=6,ATTRB=PROT,COLOR=PINK              
+         DFHMDF POS=(13,38),LENGTH=1,ATTRB=ASKIP                        
+FLITD4   DFHMDF POS=(13,38),LENGTH=5,ATTRB=PROT,COLOR=PINK              
+         DFHMDF POS=(13,44),LENGTH=1,ATTRB=ASKIP                        
+FLITL4   DFHMDF POS=(13,44),LENGTH=5,ATTRB=PROT,COLOR=PINK              
+         DFHMDF POS=(13,50),LENGTH=1,ATTRB=ASKIP                        
+FLIDE4   DFHMDF POS=(13,51),LENGTH=3,ATTRB=PROT,COLOR=PINK              
+         DFHMDF POS=(13,55),LENGTH=1,ATTRB=ASKIP                        
+FLILD4   DFHMDF POS=(13,56),LENGTH=3,ATTRB=PROT,COLOR=PINK              
+         DFHMDF POS=(13,60),LENGTH=1,ATTRB=ASKIP                        
+FLIPL4   DFHMDF POS=(13,62),LENGTH=3,ATTRB=PROT,COLOR=PINK              
+         DFHMDF POS=(13,66),LENGTH=1,ATTRB=ASKIP                        
+FLIDT4   DFHMDF POS=(13,67),LENGTH=10,ATTRB=PROT,COLOR=PINK             
+         DFHMDF POS=(13,78),LENGTH=1,ATTRB=ASKIP                        
+         DFHMDF POS=(14,2),LENGTH=20,ATTRB=PROT,COLOR=WHITE,           X
+                INITIAL='DEP AIRPORT:  '                                
+DAIR     DFHMDF POS=(14,17),LENGTH=3,ATTRB=(FSET,UNPROT),COLOR=WHITE,  X
+                HILIGHT=UNDERLINE                                       
+         DFHMDF POS=(14,21),LENGTH=1,ATTRB=ASKIP                        
+FLIID5   DFHMDF POS=(14,31),LENGTH=6,ATTRB=PROT,COLOR=PINK              
+         DFHMDF POS=(14,38),LENGTH=1,ATTRB=ASKIP                        
+FLITD5   DFHMDF POS=(14,38),LENGTH=5,ATTRB=PROT,COLOR=PINK              
+         DFHMDF POS=(14,44),LENGTH=1,ATTRB=ASKIP                        
+FLITL5   DFHMDF POS=(14,44),LENGTH=5,ATTRB=PROT,COLOR=PINK              
+         DFHMDF POS=(14,50),LENGTH=1,ATTRB=ASKIP                        
+FLIDE5   DFHMDF POS=(14,51),LENGTH=3,ATTRB=PROT,COLOR=PINK              
+         DFHMDF POS=(14,55),LENGTH=1,ATTRB=ASKIP                        
+FLILD5   DFHMDF POS=(14,56),LENGTH=3,ATTRB=PROT,COLOR=PINK              
+         DFHMDF POS=(14,60),LENGTH=1,ATTRB=ASKIP                        
+FLIPL5   DFHMDF POS=(14,62),LENGTH=3,ATTRB=PROT,COLOR=PINK              
+         DFHMDF POS=(14,66),LENGTH=1,ATTRB=ASKIP                        
+FLIDT5   DFHMDF POS=(14,67),LENGTH=10,ATTRB=PROT,COLOR=PINK             
+         DFHMDF POS=(14,78),LENGTH=1,ATTRB=ASKIP                        
+FLIID6   DFHMDF POS=(15,31),LENGTH=6,ATTRB=PROT,COLOR=PINK              
+         DFHMDF POS=(15,38),LENGTH=1,ATTRB=ASKIP                        
+FLITD6   DFHMDF POS=(15,38),LENGTH=5,ATTRB=PROT,COLOR=PINK              
+         DFHMDF POS=(15,44),LENGTH=1,ATTRB=ASKIP                        
+FLITL6   DFHMDF POS=(15,44),LENGTH=5,ATTRB=PROT,COLOR=PINK              
+         DFHMDF POS=(15,50),LENGTH=1,ATTRB=ASKIP                        
+FLIDE6   DFHMDF POS=(15,51),LENGTH=3,ATTRB=PROT,COLOR=PINK              
+         DFHMDF POS=(15,55),LENGTH=1,ATTRB=ASKIP                        
+FLILD6   DFHMDF POS=(15,56),LENGTH=3,ATTRB=PROT,COLOR=PINK              
+         DFHMDF POS=(15,60),LENGTH=1,ATTRB=ASKIP                        
+FLIPL6   DFHMDF POS=(15,62),LENGTH=3,ATTRB=PROT,COLOR=PINK              
+         DFHMDF POS=(15,66),LENGTH=1,ATTRB=ASKIP                        
+FLIDT6   DFHMDF POS=(15,67),LENGTH=10,ATTRB=PROT,COLOR=PINK             
+         DFHMDF POS=(15,78),LENGTH=1,ATTRB=ASKIP                        
+FLIID7   DFHMDF POS=(16,31),LENGTH=6,ATTRB=PROT,COLOR=PINK              
+         DFHMDF POS=(16,38),LENGTH=1,ATTRB=ASKIP                        
+FLITD7   DFHMDF POS=(16,38),LENGTH=5,ATTRB=PROT,COLOR=PINK              
+         DFHMDF POS=(16,44),LENGTH=1,ATTRB=ASKIP                        
+FLITL7   DFHMDF POS=(16,44),LENGTH=5,ATTRB=PROT,COLOR=PINK              
+         DFHMDF POS=(16,50),LENGTH=1,ATTRB=ASKIP                        
+FLIDE7   DFHMDF POS=(16,51),LENGTH=3,ATTRB=PROT,COLOR=PINK              
+         DFHMDF POS=(16,55),LENGTH=1,ATTRB=ASKIP                        
+FLILD7   DFHMDF POS=(16,56),LENGTH=3,ATTRB=PROT,COLOR=PINK              
+         DFHMDF POS=(16,60),LENGTH=1,ATTRB=ASKIP                        
+FLIPL7   DFHMDF POS=(16,62),LENGTH=3,ATTRB=PROT,COLOR=PINK              
+         DFHMDF POS=(16,66),LENGTH=1,ATTRB=ASKIP                        
+FLIDT7   DFHMDF POS=(16,67),LENGTH=10,ATTRB=PROT,COLOR=PINK             
+         DFHMDF POS=(16,78),LENGTH=1,ATTRB=ASKIP                        
+         DFHMDF POS=(17,2),LENGTH=20,ATTRB=PROT,COLOR=WHITE,           X
+                INITIAL='LAND AIRPORT: '                                
+LAIR     DFHMDF POS=(17,17),LENGTH=3,ATTRB=(FSET,UNPROT),COLOR=WHITE,  X
+                HILIGHT=UNDERLINE                                       
+         DFHMDF POS=(17,21),LENGTH=1,ATTRB=ASKIP                        
+FLIID8   DFHMDF POS=(17,31),LENGTH=6,ATTRB=PROT,COLOR=PINK              
+         DFHMDF POS=(17,38),LENGTH=1,ATTRB=ASKIP                        
+FLITD8   DFHMDF POS=(17,38),LENGTH=5,ATTRB=PROT,COLOR=PINK              
+         DFHMDF POS=(17,44),LENGTH=1,ATTRB=ASKIP                        
+FLITL8   DFHMDF POS=(17,44),LENGTH=5,ATTRB=PROT,COLOR=PINK              
+         DFHMDF POS=(17,50),LENGTH=1,ATTRB=ASKIP                        
+FLIDE8   DFHMDF POS=(17,51),LENGTH=3,ATTRB=PROT,COLOR=PINK              
+         DFHMDF POS=(17,55),LENGTH=1,ATTRB=ASKIP                        
+FLILD8   DFHMDF POS=(17,56),LENGTH=3,ATTRB=PROT,COLOR=PINK              
+         DFHMDF POS=(17,60),LENGTH=1,ATTRB=ASKIP                        
+FLIPL8   DFHMDF POS=(17,62),LENGTH=3,ATTRB=PROT,COLOR=PINK              
+         DFHMDF POS=(17,66),LENGTH=1,ATTRB=ASKIP                        
+FLIDT8   DFHMDF POS=(17,67),LENGTH=10,ATTRB=PROT,COLOR=PINK             
+         DFHMDF POS=(17,78),LENGTH=1,ATTRB=ASKIP                        
+FLIID9   DFHMDF POS=(18,31),LENGTH=6,ATTRB=PROT,COLOR=PINK              
+         DFHMDF POS=(18,38),LENGTH=1,ATTRB=ASKIP                        
+FLITD9   DFHMDF POS=(18,38),LENGTH=5,ATTRB=PROT,COLOR=PINK              
+         DFHMDF POS=(18,44),LENGTH=1,ATTRB=ASKIP                        
+FLITL9   DFHMDF POS=(18,44),LENGTH=5,ATTRB=PROT,COLOR=PINK              
+         DFHMDF POS=(18,50),LENGTH=1,ATTRB=ASKIP                        
+FLIDE9   DFHMDF POS=(18,51),LENGTH=3,ATTRB=PROT,COLOR=PINK              
+         DFHMDF POS=(18,55),LENGTH=1,ATTRB=ASKIP                        
+FLILD9   DFHMDF POS=(18,56),LENGTH=3,ATTRB=PROT,COLOR=PINK              
+         DFHMDF POS=(18,60),LENGTH=1,ATTRB=ASKIP                        
+FLIPL9   DFHMDF POS=(18,62),LENGTH=3,ATTRB=PROT,COLOR=PINK              
+         DFHMDF POS=(18,66),LENGTH=1,ATTRB=ASKIP                        
+FLIDT9   DFHMDF POS=(18,67),LENGTH=10,ATTRB=PROT,COLOR=PINK             
+         DFHMDF POS=(18,78),LENGTH=1,ATTRB=ASKIP                        
+         DFHMDF POS=(21,1),LENGTH=3,ATTRB=PROT,COLOR=RED,INITIAL='==>'  
+MSG1     DFHMDF POS=(21,5),LENGTH=72,ATTRB=PROT,HILIGHT=UNDERLINE       
+         DFHMDF POS=(21,77),LENGTH=1,ATTRB=ASKIP                        
+         DFHMDF POS=(22,1),LENGTH=3,ATTRB=PROT,COLOR=RED,INITIAL='==>'  
+MSG2     DFHMDF POS=(22,5),LENGTH=72,ATTRB=PROT,HILIGHT=UNDERLINE       
+         DFHMDF POS=(22,77),LENGTH=1,ATTRB=ASKIP                        
+         DFHMDF POS=(24,8),LENGTH=08,ATTRB=(PROT,BRT),COLOR=GREEN      X
+                INITIAL='F3=EXIT '                                      
+         DFHMDF POS=(24,17),LENGTH=16,ATTRB=(PROT,BRT),COLOR=YELLOW    X
+                INITIAL='F4=SEARCH FLIGHT'                              
+         DFHMDF POS=(24,34),LENGTH=40,ATTRB=(PROT,BRT),COLOR=GREEN     X
+                INITIAL=' F5=SEARCH TICKET  F6=SELL  F7=PASS REG.'      
+         DFHMSD TYPE=FINAL                                              
+         END                                                            
