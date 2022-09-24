@@ -1,0 +1,291 @@
+******************************************************************     
+* PROGRAM NAME                 : SUINSRT                         *     
+* IMPORTANT FILE               : JSON EMPLOPYEE FILE             *     
+* PROGRAMMER                   : KERESTES                        *     
+* DATE OF WRITEN               : SEPT. 2022                      *     
+* TECHNOLOGY                   : CICS + COBOL + DB2              *     
+******************************************************************     
+*                   PROBLEM  DEFINITION                          *     
+*                                                                *     
+* THIS PROGRAM RECEIVE A JSON FILE AND PASS THE INFORMATION TO   *     
+* THE MAIN INSERT PROGRAM                                        *     
+******************************************************************     
+* INPUT PARAMETERS:                                              *     
+*                                                                *     
+* TABLE EMPLOYEE FIELDS IN JSON UTF-8 FORMAT                     *     
+******************************************************************     
+* OUTPUT PARAMETERS:                                             *     
+*                                                                *     
+* CONVERTED FIELDS FOR TABLE EMPLYEE                             *     
+******************************************************************     
+                                                                       
+******************************************************************     
+*                  IDENTIFICATION DIVISION.                      *     
+******************************************************************     
+                                                                       
+ IDENTIFICATION                            DIVISION.                   
+ PROGRAM-ID. SUINSRT.                                                  
+                                                                       
+******************************************************************     
+*                     ENVIRONMENT DIVISION.                      *     
+******************************************************************     
+                                                                       
+ ENVIRONMENT                               DIVISION.                   
+                                                                       
+*---------------------*                                                
+ INPUT-OUTPUT SECTION.                                               
+*---------------------*                                              
+                                                                     
+ FILE-CONTROL.                                                       
+                                                                     
+     SELECT INSERTEMP ASSIGN TO EMPLIST                              
+     ORGANIZATION IS SEQUENTIAL                                      
+     FILE STATUS IS FS-INSERTEMP.                                    
+                                                                     
+******************************************************************   
+*                        DATA DIVISION.                          *   
+******************************************************************   
+                                                                     
+ DATA                                      DIVISION.                 
+                                                                     
+*-------------*                                                      
+ FILE SECTION.                                                       
+*-------------*                                                      
+                                                                     
+ FD INSERTEMP RECORDING MODE IS F.                                   
+                                                                     
+ 01  IN-JSON                          PIC X(13000).                  
+                                                                     
+*------------------------*                                           
+ WORKING-STORAGE SECTION.                                            
+*------------------------*                                           
+                                                                     
+*                     INPUTE FILE'S STATUS                           
+                                                                     
+ 01  FS-INSERTEMP                     PIC X(2).                      
+     88  FS-INSERTEMP-OK              VALUE '00'.                    
+     88  FS-INSERTEMP-END             VALUE '10'.                    
+                                                                     
+ 01  SUBPROGRAM                       PIC X(8).                      
+ 01  WS-DATE                          PIC X(10).                     
+                                                                     
+ 01  JSONDOC                          PIC X(13000) VALUE SPACES. 
+ 01  JSONDOC2                         PIC X(13000) VALUE SPACES. 
+                                                                  
+ 01  COUNT1                           PIC 9(5). 
+ 01  COUNT2                           PIC 9(5). 
+ 01  COUNT3                           PIC 9(5). 
+ 01  COUNT4                           PIC 9(5) USAGE COMP-5. 
+                                                                  
+ 01  WS-EMPLIST. 
+      02 WS-EMPLIST-TABLE OCCURS 30. 
+         03 EMPID                     PIC 9(8). 
+         03 PASSW                     PIC X(8). 
+         03 FIRSTNAME                 PIC X(30). 
+         03 LASTNAME                  PIC X(30). 
+         03 ADDRE                     PIC X(100). 
+         03 CITY                      PIC X(50). 
+         03 ZIPCODE                   PIC X(15). 
+         03 TELEPHONE                 PIC X(10). 
+         03 EMAIL                     PIC X(100). 
+         03 ADMINDATE                 PIC X(10). 
+         03 SALARY                    PIC 9(6)V9(2). 
+         03 DEPTID                    PIC 9(9). 
+                                                                  
+*----------------* 
+ LINKAGE SECTION. 
+*----------------* 
+                                                                  
+ 01  LS-EMPLIST. 
+      02 LS-EMPLIST-TABLE OCCURS 30. 
+         03 LS-EMPID              PIC X(8). 
+         03 LS-FIRSTNAME. 
+            04 LS-FIRSTNAME_L     PIC 9(4) USAGE COMP. 
+            04 LS-FIRSTNAME_T     PIC X(30). 
+         03 LS-LASTNAME. 
+            04 LS-LASTNAME_L      PIC 9(4) USAGE COMP. 
+            04 LS-LASTNAME_T      PIC X(30). 
+         03 LS-ADDRE.                                               
+            04 LS-ADDRE_L         PIC 9(4) USAGE COMP.              
+            04 LS-ADDRE_T         PIC X(100).                       
+         03 LS-CITY.                                                
+            04 LS-CITY_L          PIC 9(4) USAGE COMP.              
+            04 LS-CITY_T          PIC X(50).                        
+         03 LS-ZIPCODE.                                             
+            04 LS-ZIPCODE_L       PIC 9(4) USAGE COMP.              
+            04 LS-ZIPCODE_T       PIC X(15).                        
+         03 LS-TELEPHONE.                                           
+            04 LS-TELEPHONE_L     PIC 9(4) USAGE COMP.              
+            04 LS-TELEPHONE_T     PIC X(10).                        
+         03 LS-EMAIL.                                               
+            04 LS-EMAIL_L         PIC 9(4) USAGE COMP.              
+            04 LS-EMAIL_T         PIC X(100).                       
+         03 LS-ADMIDATE           PIC X(10).                        
+         03 LS-SALARY             PIC 9(6)V9(2) USAGE COMP-3.       
+         03 LS-DEPTID             PIC 9(9) USAGE COMP.              
+                                                                    
+****************************************************************    
+*      PROCEDURE DIVISION WITH LINKAGE SECTION                 *    
+****************************************************************    
+                                                                    
+ PROCEDURE DIVISION USING LS-EMPLIST.                               
+                                                                    
+ MAIN-PARA.                                                         
+                                                                    
+     PERFORM 0100-OPEN-FILE.                                        
+     PERFORM 0200-READ-PROCESS.                                     
+     PERFORM 0300-CRYPT-PASS VARYING COUNT1 FROM 1 BY 1 UNTIL       
+                                 COUNT1 > 30                        
+     PERFORM 0400-END-FILE                                          
+                                                                    
+     GOBACK.                                                        
+                                                                    
+*****************************************************************   
+* 0100-OPEN-FILE.                                               * 
+*                                                               * 
+* IT OPENS THE FILE TO PUT THE ENCRYPTED PASSWORD.              * 
+***************************************************************** 
+                                                                  
+ 0100-OPEN-FILE. 
+                                                                  
+     OPEN INPUT INSERTEMP 
+                                                                  
+     IF NOT FS-INSERTEMP-OK 
+        DISPLAY 'FILE OPENING ERROR' 
+        DISPLAY 'FILE WILL NOT BE READ' 
+        DISPLAY 'ERROR: ' FS-INSERTEMP 
+        GOBACK 
+     END-IF. 
+                                                                  
+************************************************************** 
+* 0200-READ-PROCESS.                                         * 
+*                                                            * 
+* IT READS THE JSON FILE AND MOVE THE DATA TO A TABLE TO SEND* 
+* THE CONVERT DATA TO A MAIN INSERT PROGRAM                  * 
+************************************************************** 
+                                                                  
+ 0200-READ-PROCESS. 
+                                                                  
+     READ INSERTEMP 
+     END-READ 
+     IF NOT FS-INSERTEMP-OK 
+        DISPLAY 'READ ERROR: ' FS-INSERTEMP 
+     END-IF 
+                                                                  
+     JSON PARSE IN-JSON INTO WS-EMPLIST 
+        WITH DETAIL 
+     END-JSON 
+                                                                  
+     PERFORM 0210-MOVE-TABLE VARYING COUNT1 FROM 1 BY 1 UNTIL 
+                                         COUNT1 > 30. 
+                                                                  
+************************************************************** 
+* 0210-MOVE-TABLE.                                           * 
+*                                                            * 
+* IT ADAPTS THE DATA TO A DB2 FORMAT                         * 
+************************************************************** 
+                                                                  
+ 0210-MOVE-TABLE. 
+                                                                  
+     IF EMPID(COUNT1) IS NUMERIC 
+                                                                  
+        ADD 10000000 TO EMPID(COUNT1) 
+        MOVE EMPID(COUNT1) TO LS-EMPID(COUNT1) 
+                                                                  
+        MOVE FIRSTNAME(COUNT1) TO LS-FIRSTNAME_T(COUNT1) 
+        INSPECT FIRSTNAME(COUNT1) TALLYING COUNT2 FOR ALL SPACES 
+        COMPUTE COUNT3 = 30 - COUNT2 
+        MOVE COUNT3 TO LS-FIRSTNAME_L(COUNT1) 
+                                                                  
+        MOVE 0 TO COUNT2 
+        MOVE 0 TO COUNT3 
+                                                                  
+        MOVE LASTNAME(COUNT1) TO LS-LASTNAME_T(COUNT1) 
+        INSPECT LASTNAME(COUNT1) TALLYING COUNT2 FOR ALL SPACES 
+        COMPUTE COUNT3 = 30 - COUNT2 
+        MOVE COUNT3 TO LS-LASTNAME_L(COUNT1) 
+                                                                  
+        MOVE 0 TO COUNT2 
+        MOVE 0 TO COUNT3 
+                                                                  
+        MOVE ADDRE(COUNT1) TO LS-ADDRE_T(COUNT1) 
+        INSPECT ADDRE(COUNT1) TALLYING COUNT2 FOR ALL SPACES 
+        COMPUTE COUNT3 = 100 - COUNT2 + 5 
+        MOVE COUNT3 TO LS-ADDRE_L(COUNT1) 
+                                                                  
+        MOVE 0 TO COUNT2 
+        MOVE 0 TO COUNT3 
+                                                                  
+        MOVE CITY(COUNT1) TO LS-CITY_T(COUNT1) 
+        INSPECT CITY(COUNT1) TALLYING COUNT2 FOR ALL SPACES 
+        COMPUTE COUNT3 = 50 - COUNT2 
+        MOVE COUNT3 TO LS-CITY_L(COUNT1) 
+                                                                  
+        MOVE 0 TO COUNT2 
+        MOVE 0 TO COUNT3 
+                                                                  
+        MOVE ZIPCODE(COUNT1) TO LS-ZIPCODE_T(COUNT1) 
+        INSPECT ZIPCODE(COUNT1) TALLYING COUNT2 FOR ALL SPACES 
+        COMPUTE COUNT3 = 15 - COUNT2 
+        MOVE COUNT3 TO LS-ZIPCODE_L(COUNT1) 
+                                                                  
+        MOVE 0 TO COUNT2 
+        MOVE 0 TO COUNT3 
+                                                                  
+        MOVE TELEPHONE(COUNT1) TO LS-TELEPHONE_T(COUNT1) 
+        INSPECT FIRSTNAME(COUNT1) TALLYING COUNT2 FOR ALL SPACES 
+        COMPUTE COUNT3 = 10 - COUNT2 
+        MOVE COUNT3 TO LS-TELEPHONE_L(COUNT1) 
+                                                                  
+        MOVE 0 TO COUNT2 
+        MOVE 0 TO COUNT3 
+                                                                  
+        MOVE EMAIL(COUNT1) TO LS-EMAIL_T(COUNT1) 
+        INSPECT EMAIL(COUNT1) TALLYING COUNT2 FOR ALL SPACES 
+        COMPUTE COUNT3 = 100 - COUNT2 
+        MOVE COUNT3 TO LS-EMAIL_L(COUNT1) 
+                                                                  
+        MOVE 0 TO COUNT2 
+        MOVE 0 TO COUNT3 
+                                                                  
+        MOVE ADMINDATE(COUNT1)(6:3) TO WS-DATE(1:3) 
+        MOVE ADMINDATE(COUNT1)(9:2) TO WS-DATE(4:2)                  
+        MOVE '/' TO WS-DATE(6:1)                                     
+        MOVE ADMINDATE(COUNT1)(1:4) TO WS-DATE(7:4)                  
+        MOVE WS-DATE TO ADMINDATE(COUNT1)                            
+        MOVE ADMINDATE(COUNT1) TO LS-ADMIDATE(COUNT1)                
+        MOVE SALARY(COUNT1) TO LS-SALARY(COUNT1)                     
+        MOVE DEPTID(COUNT1) TO LS-DEPTID(COUNT1)                     
+                                                                     
+     END-IF.                                                         
+                                                                     
+*************************************************************        
+* 0300-CRYPT-PASS.                                          *        
+*                                                           *        
+* IT CALLS THE ENCRYPTATION PROGRAM TO STORE THE PASSWORD   *        
+*************************************************************        
+                                                                     
+ 0300-CRYPT-PASS.                                                    
+                                                                     
+     IF EMPID(COUNT1) IS NUMERIC                                     
+                                                                     
+        MOVE 'CRYPTPGM' TO SUBPROGRAM                                
+        CALL SUBPROGRAM USING PASSW(COUNT1), EMPID(COUNT1),          
+                                  ADMINDATE(COUNT1)                  
+                                                                     
+     END-IF.                                                         
+                                                                     
+**************************************************************       
+* 0400-END-FILE.                                             *       
+*                                                            *       
+* IT CLOSES THE JSON FILE.                                   *       
+**************************************************************       
+                                                                     
+ 0400-END-FILE.                                                      
+                                                                     
+     CLOSE INSERTEMP                                                 
+                                                                     
+     IF NOT FS-INSERTEMP-OK 
+        DISPLAY 'ERROR TO CLOSE: ' FS-INSERTEMP 
+     END-IF. 
+                                                                                   

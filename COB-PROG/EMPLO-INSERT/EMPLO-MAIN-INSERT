@@ -1,0 +1,145 @@
+******************************************************************  
+* PROGRAM NAME                 : EMPINSRT                        *  
+* IMPORTANT FILE               : PASSDOC                         *  
+* PROGRAMMER                   : KERESTES                        *  
+* DATE OF WRITEN               : SEPT. 2022                      *  
+* TECHNOLOGY                   : CICS + COBOL + DB2              *  
+******************************************************************  
+*                   PROBLEM  DEFINITION                          *  
+*                                                                *  
+* THIS PROGRAM MAKE THE PASSWORD ENCRYPTATION                    *  
+******************************************************************  
+* INPUT PARAMETERS:                                              *  
+*                                                                *  
+* PASSWORD, CLIENTID, ADMINDATE                                  *  
+******************************************************************  
+* OUTPUT PARAMETERS:                                             *  
+*                                                                *  
+* ENCRYPTED PASSWORD                                             *  
+******************************************************************  
+                                                                    
+******************************************************************  
+*                  IDENTIFICATION DIVISION.                      *  
+******************************************************************  
+                                                                    
+ IDENTIFICATION                            DIVISION.                
+ PROGRAM-ID.  EMPINSRT.                                             
+                                                                    
+******************************************************************  
+*                      EVIRONMENT DIVISION.                      *  
+******************************************************************  
+                                                                    
+ ENVIRONMENT                               DIVISION.                
+                                                                    
+******************************************************************  
+*                         DATA DIVISION.                         *  
+                                                                  
+ DATA                                      DIVISION. 
+                                                                  
+*------------------------* 
+ WORKING-STORAGE SECTION. 
+*------------------------* 
+                                                                  
+ 01  SUBPROGRAM               PIC X(8). 
+                                                                  
+*        WS SQL TABLE DESCRIPTION TO RECEIVE JSON FILE 
+                                                                  
+ 01  F-EMPLIST. 
+      02 F-EMPLIST-TABLE OCCURS 30. 
+         03 F-EMPID              PIC X(8). 
+         03 F-FIRSTNAME. 
+            04 F-FIRSTNAME_L     PIC 9(4) USAGE COMP. 
+            04 F-FIRSTNAME_T     PIC X(30). 
+         03 F-LASTNAME. 
+            04 F-LASTNAME_L      PIC 9(4) USAGE COMP. 
+            04 F-LASTNAME_T      PIC X(30). 
+         03 F-ADDRE. 
+            04 F-ADDRE_L         PIC 9(4) USAGE COMP. 
+            04 F-ADDRE_T         PIC X(100). 
+         03 F-CITY. 
+            04 F-CITY_L          PIC 9(4) USAGE COMP. 
+            04 F-CITY_T          PIC X(50). 
+         03 F-ZIPCODE. 
+            04 F-ZIPCODE_L       PIC 9(4) USAGE COMP. 
+            04 F-ZIPCODE_T       PIC X(15). 
+         03 F-TELEPHONE. 
+            04 F-TELEPHONE_L     PIC 9(4) USAGE COMP. 
+            04 F-TELEPHONE_T     PIC X(10). 
+         03 F-EMAIL. 
+            04 F-EMAIL_L         PIC 9(4) USAGE COMP. 
+            04 F-EMAIL_T         PIC X(100). 
+         03 F-ADMIDATE           PIC X(10). 
+         03 F-SALARY             PIC 9(6)V9(2) USAGE COMP-3. 
+         03 F-DEPTID             PIC 9(9) USAGE COMP. 
+                                                                  
+*                         WS COUNTERS 
+                                                                  
+ 01  COUNT1                    PIC 9(3). 
+                                                                  
+*------------------* 
+* SQL STATEMENTS   * 
+*------------------* 
+                                                                  
+     EXEC SQL 
+         INCLUDE EMPLO 
+     END-EXEC. 
+                                                                  
+     EXEC SQL 
+         INCLUDE SQLCA 
+     END-EXEC. 
+                                                                  
+*************************************************************** 
+*                     PROCEDURE DIVISION                      * 
+*************************************************************** 
+                                                                  
+ PROCEDURE                                 DIVISION. 
+                                                                  
+ MAIN-PARA. 
+                                                                  
+     MOVE SPACE TO F-EMPLIST. 
+     PERFORM 0100-GETTING-DATA. 
+     PERFORM 0200-INSERT-DB2 VARYING COUNT1 FROM 1 BY 1 
+                                     UNTIL COUNT1 > 30 
+                                                                  
+     GOBACK. 
+                                                                  
+***************************************************************** 
+* 0100-GETTING-DATA.                                            * 
+*                                                               * 
+* IT RUNS THE SUBINSRT PROGRAM TO GET THE DATE INTO DE F-EMPLIST* 
+* AND INSERT THIS DATA IN THE DB2                               * 
+**************************************************************** 
+                                                                  
+ 0100-GETTING-DATA. 
+                                                                  
+     MOVE 'SUINSRT' TO SUBPROGRAM 
+                                                                  
+     CALL SUBPROGRAM USING F-EMPLIST. 
+                                                                  
+***************************************************************** 
+* 0200-INSERT-DB2.                                              * 
+*                                                               * 
+* IT INSERT THE DATA INTO DE DB2                                * 
+*****************************************************************
+                                                                  
+ 0200-INSERT-DB2. 
+                                                                  
+     IF F-EMPID NOT = SPACE 
+        MOVE F-EMPLIST-TABLE(COUNT1) TO DCLEMPLO 
+                                                                  
+        EXEC SQL 
+           INSERT INTO EMPLO 
+               (EMPID,FIRSTNAME,LASTNAME,ADDRE,CITY, 
+                ZIPCODE,TELEPHONE,EMAIL,ADMIDATE,SALARY,DEPTID) 
+           VALUES 
+               (:EMPID,:FIRSTNAME_TEXT,:LASTNAME_TEXT, 
+                :ADDRE_TEXT,:CITY_TEXT,:ZIPCODE_TEXT, 
+                :TELEPHONE_TEXT,:EMAIL_TEXT,:ADMIDATE, 
+                :SALARY,:DEPTID) 
+        END-EXEC 
+                                                                  
+        IF SQLCODE NOT = 0 
+           DISPLAY 'ELEMENTO ' COUNT1 ' SQLCODE: ' SQLCODE 
+           DISPLAY 'SQLSTATE: ' SQLSTATE 
+        END-IF 
+     END-IF.             
