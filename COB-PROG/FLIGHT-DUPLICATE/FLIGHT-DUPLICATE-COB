@@ -1,0 +1,188 @@
+****************************************************************     
+* PROGRAM NAME                 : CBFLIGHT                      *     
+* IMPORTANTE FILE              : DB2 TABLE FLIGHT              *     
+* PROGRAMMER                   : KERESTES                      *     
+* DATA OF WRITEN               : SEPT. 2022                    *     
+****************************************************************     
+*                   PROBLEM  DEFINITION                        *     
+*                                                              *     
+*           DUPLICATE DATA IN THE FLIGHT TABLE DB2             *     
+****************************************************************     
+* INPUT PARAMETERS:                                            *     
+*                                                              *     
+* DATA IN THE DB2 TABLE                                        *     
+****************************************************************     
+* OUTPUT PARAMETERS:                                           *     
+*                                                              *     
+* DUPLICATE DATA WITH OTHERS DATES IN THE SAME TABLE           *     
+****************************************************************     
+                                                                     
+****************************************************************     
+*                  IDENTIFICATION DIVISION.                    *     
+****************************************************************     
+                                                                     
+ IDENTIFICATION DIVISION.                                            
+ PROGRAM-ID. CBFLIGHT.                                               
+                                                                     
+****************************************************************     
+*                        DATA DIVISION.                        *     
+****************************************************************     
+                                                                     
+ DATA DIVISION.                                                      
+                                                                     
+*------------------------*                                           
+ WORKING-STORAGE SECTION.                                            
+*------------------------*                                           
+                                                                     
+****************************************************************     
+*                   TABLE FLIGHT DECLARATION                   *     
+****************************************************************     
+                                                                     
+ 01  WS-FLIGHT.                                                      
+     02 WS-TABLE-FLIGHT OCCURS 31.                                   
+        03 WS-FLIGHTID                    PIC S9(9) USAGE COMP.      
+        03 WS-FLIGHTDATE.                                            
+           04 WS-YEAR                     PIC 9(4).                  
+           04 FILLER                      PIC X.                     
+           04 WS-MONTHDATE                PIC 9(2).                  
+           04 FILLER                      PIC X.                     
+           04 WS-DAY                      PIC 9(2).                  
+        03 WS-DEPTIME                     PIC X(8).                  
+        03 WS-ARRTIME                     PIC X(8).                  
+        03 WS-TOTPASS                     PIC S9(9) USAGE COMP.      
+        03 WS-TOTBAGGA                    PIC S9(9) USAGE COMP.      
+        03 WS-FLIGHTNUM                   PIC X(6).                  
+        03 WS-SHIFTID                     PIC S9(9) USAGE COMP.      
+        03 WS-AIRPLANEID                  PIC X(8).                  
+        03 WS-AIRPORTDEP                  PIC X(4).                  
+        03 WS-AIRPORTARR                  PIC X(4).                  
+                                                                     
+****************************************************************     
+*                      TABLE MONTHS AND DAYS                   *     
+****************************************************************     
+                                                                     
+ 01  MONTH                                PIC X(24)                  
+                VALUE  '312831303130313130313031'.                   
+                                                                     
+ 01  MONTH-RED REDEFINES MONTH.                                      
+     02 WS-MONTH                          PIC 9(2) OCCURS 12.        
+                                                                     
+****************************************************************     
+*                          COUNTERS                            *     
+****************************************************************     
+                                                                     
+ 01  COUNT1                            PIC 9(2).                     
+ 01  COUNT2                            PIC 9(2).                     
+                                                                     
+****************************************************************     
+*                   FLIGHT'S NAME = FLIGHTNUM                  *     
+****************************************************************     
+                                                                     
+ 01  FLIGHTNUM-TABLE                   PIC X(48)                     
+       VALUE  'CB1104CB1105CB2204CB2205CB3304CB3305CB4404CB4405'.    
+                                                                     
+ 01  WS-FLIGHTNUM REDEFINES FLIGHTNUM-TABLE.                         
+     02 WS-FLIGHTNUM-F                 PIC X(6) OCCURS 8.            
+                                                                     
+ 01  WS-FLIGHTNUM-DEF                  PIC X(6).                     
+****************************************************************     
+*                        SQL DECLARATION.                      *     
+****************************************************************     
+                                                                     
+     EXEC SQL                                                        
+         INCLUDE FLIGHT                                              
+     END-EXEC.                                                       
+                                                                     
+     EXEC SQL                                                        
+         INCLUDE SQLCA                                               
+     END-EXEC.                                                       
+                                                                     
+****************************************************************     
+*                       PROCEDURE DIVISION.                    *     
+****************************************************************     
+                                                                     
+ PROCEDURE DIVISION.                                                 
+                                                                     
+     PERFORM VARYING COUNT2 FROM 1 BY 1 UNTIL COUNT2 > 8             
+                                                                     
+         PERFORM 0100-GET-DB2-DATA                                     
+        PERFORM 0200-DUPLICATE-DATA                                   
+        PERFORM 0300-INSERT-DATA                                      
+                                                                      
+     END-PERFORM.                                                     
+                                                                      
+     GOBACK.                                                          
+                                                                      
+****************************************************************      
+* 0100-GET-DB2-DATA                                            *      
+*                                                              *      
+* IT GETS THE INFORMATION FROM THE DB2 TABLE                   *      
+****************************************************************      
+                                                                      
+ 0100-GET-DB2-DATA.                                                   
+                                                                      
+     MOVE WS-FLIGHTNUM-F(COUNT2) TO WS-FLIGHTNUM-DEF                  
+                                                                      
+     EXEC SQL                                                         
+         SELECT *                                                     
+         INTO :DCLFLIGHT                                              
+         FROM FLIGHT                                                  
+         WHERE FLIGHTNUM = :WS-FLIGHTNUM-DEF                          
+*          AND (FLIGHTDATE = '01/09/2022')                            
+     END-EXEC                                                         
+                                                                      
+     IF SQLCODE NOT = 0                                               
+        DISPLAY 'EXTRACTION ERROR DATA'                               
+        DISPLAY 'THE FLIGHTNUM IS: ' WS-FLIGHTNUM-F(COUNT2)           
+        DISPLAY 'ERROR: ' SQLCODE                                     
+        DISPLAY 'STATE: ' SQLSTATE                                    
+     END-IF.                                                          
+                                                                      
+****************************************************************      
+* 0200-DUPLICATE-DATA                                          *      
+*                                                              *      
+* IT GET THE INFROMATION FOR THE FIRST MONTH DAY AND DUPLICATE *    
+* IT TO THE WHOLE MONTH.                                       *    
+****************************************************************    
+                                                                    
+ 0200-DUPLICATE-DATA.                                               
+                                                                    
+     MOVE DCLFLIGHT TO WS-TABLE-FLIGHT(1)                           
+                                                                    
+     PERFORM VARYING COUNT1 FROM 2 BY 1 UNTIL COUNT1 > WS-MONTH(9)  
+                                                                    
+        MOVE WS-TABLE-FLIGHT(1) TO WS-TABLE-FLIGHT(COUNT1)          
+        MOVE COUNT1 TO WS-DAY(COUNT1)                               
+        DISPLAY WS-FLIGHTDATE(COUNT1)                               
+                                                                    
+     END-PERFORM.                                                   
+                                                                    
+****************************************************************    
+* 0300-INSERT-DATA                                             *    
+*                                                              *    
+* IT PUT THE NEW DUPLICATE DATA INTO THE DB2 TABLE             *    
+****************************************************************    
+                                                                    
+ 0300-INSERT-DATA.                                                  
+                                                                    
+     PERFORM VARYING COUNT1 FROM 2 BY 1 UNTIL COUNT1 > WS-MONTH(9)  
+                                                                    
+        MOVE WS-TABLE-FLIGHT(COUNT1) TO DCLFLIGHT                   
+                                                                    
+        EXEC SQL                                                    
+            INSERT INTO FLIGHT (FLIGHTDATE, DEPTIME, ARRTIME,       
+                   TOTPASS,TOTBAGGA, FLIGHTNUM, SHIFTID,            
+                   AIRPLANEID, AIRPORTDEP, AIRPORTARR)              
+            VALUES (:FLIGHTDATE, :DEPTIME, :ARRTIME, :TOTPASS,      
+                    :TOTBAGGA, :FLIGHTNUM, :SHIFTID,                
+                    :AIRPLANEID, :AIRPORTDEP, :AIRPORTARR)          
+        END-EXEC                                                    
+                                                         
+        IF SQLCODE NOT = 0 
+           DISPLAY 'EXTRACTION ERROR DATA' 
+           DISPLAY 'IN COUNTER: ' COUNT1 
+           DISPLAY 'ERROR: ' SQLCODE 
+           DISPLAY 'STATE: ' SQLSTATE 
+        END-IF 
+                                                         
+     END-PERFORM.  
