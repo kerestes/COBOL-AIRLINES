@@ -1,0 +1,247 @@
+****************************************************************
+* PROGRAM NAME                 : SUXML                         *
+* IMPORTANTE FILE              : PASS1,2,3,4,5,6,7,8           *
+* PROGRAMMER                   : KERESTES                      *
+* DATA OF WRITEN               : SEPT. 2022                    *
+****************************************************************
+*                   PROBLEM  DEFINITION                        *
+*                                                              *
+*       GET A XML FILE IN UTF-8 AND CONVERT IN COBOL VARIABLE  *
+****************************************************************
+* INPUT PARAMETERS:                                            *
+*                                                              *
+* FILE XML                                                     *
+****************************************************************
+* OUTPUT PARAMETERS:                                           *
+*                                                              *
+* COBOL TABLE                                                  *
+****************************************************************
+                                                                
+****************************************************************
+*                  IDENTIFICATION DIVISION                     *
+****************************************************************
+                                                                
+ IDENTIFICATION DIVISION. 
+                                                                
+ PROGRAM-ID. SUXML. 
+                                                                
+****************************************************************
+*                    ENVIRONMENT DIVISION                      *
+****************************************************************
+                                                                
+ ENVIRONMENT DIVISION. 
+                                                                
+****************************************************************
+*                      FILE DECLARATION.                       *
+****************************************************************
+                                                                
+*---------------------* 
+ INPUT-OUTPUT SECTION. 
+*---------------------* 
+                                                                
+ FILE-CONTROL. 
+                                                                
+     SELECT PASSENGER-FILE ASSIGN TO PASSN 
+     ORGANIZATION IS SEQUENTIAL 
+     FILE STATUS IS FS-PASSENGER-FILE. 
+                                                                
+****************************************************************
+*                        DATA DIVISION.                        *
+****************************************************************
+                                                                
+ DATA DIVISION. 
+                                                                
+****************************************************************
+*                       FILE DEFINITION                        *
+****************************************************************
+                                                                
+*-------------* 
+ FILE SECTION. 
+*-------------* 
+                                                                
+ FD PASSENGER-FILE RECORDING MODE IS F. 
+                                                                
+ 01  PASSENGER-XML               PIC X(25000). 
+                                                                
+*------------------------* 
+ WORKING-STORAGE SECTION. 
+*------------------------* 
+                                                                
+****************************************************************
+*                           COUTERS                            *
+****************************************************************
+                                                                
+  01  COUNT1                      PIC 9(5) VALUE 1. 
+                                                                  
+**************************************************************** 
+*                       ERROR VARIABLES.                       * 
+**************************************************************** 
+                                                                  
+ 01  FS-PASSENGER-FILE           PIC X(2). 
+     88 FS-PASSENGER-FILE-OK                VALUE '00'. 
+                                                                  
+**************************************************************** 
+*                         XML VARIABLES                        * 
+**************************************************************** 
+                                                                  
+ 01 XML-HEAD                     PIC X(20). 
+ 01 XML-DOC                      PIC X(25000) VALUE SPACES. 
+                                                                  
+*----------------* 
+ LINKAGE SECTION. 
+*----------------* 
+                                                                  
+ 01  PASSENGER-LIST. 
+     02 PASSENGER-TABLE OCCURS 81. 
+        03 FIRSTNAME             PIC X(30). 
+        03 LASTNAME              PIC X(30). 
+        03 ADDRE                 PIC X(250). 
+        03 CITY                  PIC X(50). 
+        03 COUNTRY               PIC X(30). 
+        03 ZIPCODE               PIC X(15). 
+        03 TELEPHONE             PIC X(18). 
+        03 EMAIL                 PIC X(100). 
+                                                                  
+**************************************************************** 
+*           PROCEDURE DIVISION WITH LINKAGE                    * 
+**************************************************************** 
+                                                                  
+ PROCEDURE DIVISION USING PASSENGER-LIST. 
+                                                                  
+     PERFORM 0100-OPEN-FILE. 
+     PERFORM 0200-READ-FILE. 
+     PERFORM 0300-CONVERT-XML. 
+     PERFORM 0400-CLOSE-FILE. 
+                                                                
+     GOBACK. 
+                                                                
+****************************************************************
+* 0100-OPEN-FILE.                                              *
+*                                                              *
+* IT OPEN THE FILE XML WITH THE PASSENGERS INFORMATION         *
+****************************************************************
+                                                                
+ 0100-OPEN-FILE. 
+                                                                
+     OPEN INPUT PASSENGER-FILE. 
+                                                                
+     IF NOT FS-PASSENGER-FILE-OK 
+        DISPLAY 'THE FILE COULD NOT BE OPEN' 
+        DISPLAY 'ERROR: ' FS-PASSENGER-FILE 
+     ELSE 
+        DISPLAY 'OPEN OK' 
+     END-IF. 
+                                                                
+****************************************************************
+* 0200-READ-FILE.                                              *
+*                                                              *
+* IT READ THE FILE INTO THE TABLE 'PASSENGER-LIST'             *
+****************************************************************
+                                                                
+ 0200-READ-FILE. 
+                                                                
+     READ PASSENGER-FILE 
+     END-READ. 
+                                                                
+     IF NOT FS-PASSENGER-FILE-OK 
+        DISPLAY 'THE PROGRAM COULD NOT READ THE FILE' 
+        DISPLAY 'ERROR: ' FS-PASSENGER-FILE 
+     ELSE 
+        DISPLAY 'READ OK' 
+     END-IF. 
+                                                                
+****************************************************************
+* 0300-CONVERT-XML.                                            *
+*                                                              *
+* IT MAKE DE PARSE PROCESS TO CONVERT XML IN COBOL VARIABLE    *
+****************************************************************
+                                                                
+ 0300-CONVERT-XML. 
+                                                                
+     MOVE FUNCTION DISPLAY-OF(FUNCTION NATIONAL-OF( 
+                    PASSENGER-XML 1208) 1047) TO XML-DOC 
+                                                                
+     XML PARSE XML-DOC PROCESSING PROCEDURE 
+                            0310-HANDLER-XML 
+*       ON EXCEPTION 
+*          DISPLAY 'XML ERROR: ' XML-CODE 
+*       NOT ON EXCEPTION 
+*          DISPLAY 'XML PARSE SUCCESSFULLY' 
+     END-XML. 
+                                                                
+****************************************************************
+* 0310-HANDLER-XML                                             *
+*                                                              *
+* IT IS THE PROCEDURE TO ACCOMPLISH THE XML PARSE PROCESS      *
+****************************************************************
+                                                                
+ 0310-HANDLER-XML. 
+                                                                
+     EVALUATE XML-EVENT 
+        WHEN 'START-OF-ELEMENT' 
+            MOVE SPACES TO XML-HEAD 
+            MOVE XML-TEXT TO XML-HEAD 
+        WHEN 'CONTENT-CHARACTERS' 
+            EVALUATE XML-HEAD 
+               WHEN 'FIRSTNAME' 
+                  MOVE XML-TEXT TO FIRSTNAME(COUNT1) 
+                  DISPLAY FIRSTNAME(COUNT1) 
+                  DISPLAY COUNT1 
+                                                      
+               WHEN 'LASTNAME' 
+                  MOVE XML-TEXT TO LASTNAME(COUNT1) 
+                  DISPLAY LASTNAME(COUNT1) 
+                  DISPLAY COUNT1 
+                                                      
+               WHEN 'ADDRE' 
+                  MOVE XML-TEXT TO ADDRE(COUNT1) 
+                  DISPLAY ADDRE(COUNT1) 
+                  DISPLAY COUNT1 
+                                                      
+               WHEN 'CITY' 
+                  MOVE XML-TEXT TO CITY(COUNT1) 
+                  DISPLAY CITY(COUNT1) 
+                  DISPLAY COUNT1 
+                                                      
+               WHEN 'COUNTRY' 
+                  MOVE XML-TEXT TO COUNTRY(COUNT1) 
+                  DISPLAY COUNTRY(COUNT1) 
+                  DISPLAY COUNT1 
+                                                      
+               WHEN 'ZIPCODE' 
+                  MOVE XML-TEXT TO ZIPCODE(COUNT1) 
+                  DISPLAY ZIPCODE(COUNT1) 
+                  DISPLAY COUNT1 
+                                                      
+               WHEN 'TELEPHONE' 
+                  MOVE XML-TEXT TO TELEPHONE(COUNT1) 
+                  DISPLAY TELEPHONE(COUNT1) 
+                  DISPLAY COUNT1 
+                                                      
+               WHEN 'EMAIL' 
+                  MOVE XML-TEXT TO EMAIL(COUNT1) 
+                  DISPLAY EMAIL(COUNT1) 
+                  DISPLAY COUNT1 
+                  ADD 1 TO COUNT1 
+                                                                 
+            END-EVALUATE 
+                                                                 
+     END-EVALUATE. 
+                                                                 
+**************************************************************** 
+* 0400-CLOSE-FILE                                              * 
+*                                                              * 
+* IT CLOSE THE FILE 'PASSENGER-FILE'                           * 
+**************************************************************** 
+                                                                 
+ 0400-CLOSE-FILE. 
+                                                                 
+     CLOSE PASSENGER-FILE 
+                                                                 
+     IF NOT FS-PASSENGER-FILE-OK 
+        DISPLAY 'THE FILE COULD NOT BE OPEN' 
+        DISPLAY 'ERROR: ' FS-PASSENGER-FILE 
+     ELSE 
+        DISPLAY 'CLOSE OK' 
+     END-IF. 
+                                                                                                                                                                 
