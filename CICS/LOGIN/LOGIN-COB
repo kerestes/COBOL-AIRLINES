@@ -1,0 +1,305 @@
+**************************************************************** 
+* PROGRAM NAME                 : LOGIN                         * 
+* IMPORTANT FILE               : DB2 TABLE EMPLO, CRYPT FILE   * 
+* PROGRAMMER                   : KERESTES                      * 
+* DATE OF WRITEN               : SEPT. 2022                    * 
+* TECHNOLOGY                   : CICS + COBOL + DB2            * 
+**************************************************************** 
+*                   PROBLEM  DEFINITION                        * 
+*                                                              * 
+*   RECEIVE USERID AND PASSWORD FROM USER VERIFY THE PASSWORD  * 
+*         AND CHOSE THE CORRECT MAP TO CALL BY XCTL            * 
+**************************************************************** 
+* INPUT PARAMETERS:                                            * 
+*                                                              * 
+* USERID AND PASSWORD BY USER                                  * 
+**************************************************************** 
+* OUTPUT PARAMETERS:                                           * 
+*                                                              * 
+* CALL THE COMPATIBLE MAP WITH THE EMPLOYEE DEPARTMENT         * 
+**************************************************************** 
+                                                                 
+**************************************************************** 
+*                  IDENTIFICATION DIVISION.                    * 
+**************************************************************** 
+                                                                 
+ IDENTIFICATION DIVISION. 
+ PROGRAM-ID. LOGIN. 
+                                                                 
+**************************************************************** 
+*                       DATA DIVISION.                         * 
+**************************************************************** 
+                                                                 
+ DATA DIVISION. 
+                                                                 
+*------------------------* 
+ WORKING-STORAGE SECTION. 
+*------------------------* 
+                                                                  
+**************************************************************** 
+*                      MAPS CICS COPY                          * 
+**************************************************************** 
+                                                                  
+ COPY LOGINMP. 
+ COPY DFHAID. 
+ COPY DFHBMSCA. 
+                                                                  
+**************************************************************** 
+*                      SQL DECLARATION.                        * 
+**************************************************************** 
+                                                                  
+     EXEC SQL 
+         INCLUDE EMPLO 
+     END-EXEC. 
+                                                                  
+     EXEC SQL 
+         INCLUDE SQLCA 
+     END-EXEC. 
+                                                                  
+**************************************************************** 
+*                        WS VARIABLES                          * 
+**************************************************************** 
+                                                                  
+ 01  WS-TSTAMP                    PIC S9(15) COMP-3. 
+                                                                  
+ 01  WS-DATE                      PIC X(10). 
+ 01  WS-TIME. 
+     02 WS-HOUR                   PIC 9(2). 
+     02 FILLER                    PIC X(1). 
+     02 WS-MINUTE                 PIC 9(2). 
+     02 FILLER                    PIC X(1). 
+     02 WS-SECOND                 PIC 9(2). 
+                                                                     
+ 01  WS-COMMAREA.                                                    
+     02 TRANSACTION               PIC X(4).                          
+     02 USER-ID                   PIC X(8).                          
+                                                                     
+ 01  WS-USERID                    PIC X(8).                          
+ 01  WS-PASSWORD                  PIC X(8).                          
+ 01  WS-ADMIDATE                  PIC X(10).                         
+ 01  WS-FLAG-LS.                                                     
+     02 WS-FLAG-RETURN            PIC X.                             
+     02 WS-FLAG-ERROR             PIC X(10).                         
+ 01  WS-DEPT                      PIC S9(9) COMP.                    
+                                                                     
+ 01  SUBPROGRAM                   PIC X(8).                          
+                                                                     
+***************************************************************      
+*                    PROCEDURE DIVISION.                      *      
+***************************************************************      
+                                                                     
+ PROCEDURE DIVISION.                                                 
+                                                                     
+***************************************************************      
+* MAIN-PARA.                                                  *      
+*                                                             *      
+* THIS PROGRAM WORKS WITH A PSEUDO-CONVERSATION METHOD.       *      
+* THE MAIN PARAGRAPH SET THE PROCEDURE FLOW WHICH CONTROLS THE*      
+* LOGIN MAP.                                                  *      
+***************************************************************      
+                                                                     
+ MAIN-PARA.                                                          
+                                                                     
+     IF EIBCALEN = 0                                                 
+         MOVE '                 WELCOME TO COBOL AIRLINES SYSTEM'    
+                                     TO MSG1O                        
+         PERFORM 0100-GET-TIME                                       
+         PERFORM 0110-GIVING-TIME                                    
+         PERFORM 0200-SEND-MAP                                       
+         PERFORM 0300-RETURN-CICS                                    
+     ELSE                                                            
+         MOVE SPACE TO MSG1O                                         
+         MOVE SPACE TO MSG2O                                         
+         PERFORM 0400-RECEIVE-MAP                                    
+         PERFORM 0500-PROCESS-LOGIN                                  
+         PERFORM 0100-GET-TIME                                       
+         PERFORM 0110-GIVING-TIME                                    
+         MOVE SPACE TO USERIDO                                       
+         MOVE SPACE TO PASSWO                                        
+         PERFORM 0200-SEND-MAP                                       
+         PERFORM 0300-RETURN-CICS.                                   
+     END-IF                                                          
+                                                                     
+***************************************************************      
+* 0100-GET-TIME.                                              *      
+*                                                             *      
+* FOR GET THE TIME WE CAN UTILISE THE CICS METHOD OR THE COBOL*      
+* METHOD IF THE FUNCTION CURRENT-TIME. BUT HERE WE CHOSE THE  *      
+* THE CICS METHOD.                                            *      
+***************************************************************      
+                                                                     
+ 0100-GET-TIME.                                                      
+                                                                     
+     EXEC CICS                                                       
+         ASKTIME                                                     
+         ABSTIME(WS-TSTAMP)                                          
+     END-EXEC                                                        
+                                                                     
+     EXEC CICS                                                       
+         FORMATTIME                                                  
+         ABSTIME(WS-TSTAMP)                                          
+         DATESEP('/')                                                
+         DDMMYYYY(WS-DATE)                                           
+     END-EXEC                                                        
+                                                                 
+     EXEC CICS 
+         FORMATTIME 
+         ABSTIME(WS-TSTAMP) 
+         TIMESEP(':') 
+         TIME(WS-TIME) 
+     END-EXEC. 
+                                                                 
+*************************************************************** 
+* 0110-GIVING-TIME.                                           * 
+*                                                             * 
+* AFTER GETTING THE TIME ITS NECESSARY TO TRANSFER THIS INFO  * 
+* TO THE LOGIN MAP ITSELF                                     * 
+*************************************************************** 
+                                                                 
+ 0110-GIVING-TIME. 
+                                                                 
+     IF WS-HOUR = 23 
+        MOVE ZEROS TO WS-HOUR 
+     ELSE 
+        ADD 1 TO WS-HOUR. 
+     END-IF 
+                                                                 
+     MOVE WS-TIME TO LHOURO 
+     MOVE WS-DATE TO LDATEO. 
+                                                                 
+*************************************************************** 
+* 0200-SEND-MAP.                                              * 
+*                                                             * 
+* SEND MAP PROCEDURE IS IMPORTANTE TO CHANGE INFORMATIONS WITH* 
+* THE USER AND IN THE PSEUDO CONVERSATION METHOD.             * 
+*************************************************************** 
+                                                                 
+ 0200-SEND-MAP. 
+                                                                 
+     EXEC CICS 
+         SEND MAP('LOGON') MAPSET('LOGINMP') ERASE 
+     END-EXEC. 
+                                                                  
+*************************************************************** 
+* 0300-RETURN-CICS.                                           * 
+*                                                             * 
+* RETURN LETS THE PROGRAM FREE TO RECEIVE OTHER INFORMATIONS  * 
+* FROM ANOTHER USERS.                                         * 
+* THE COMMUNICATION-AREA IS USED TO SEND INFORMATION BETWEEN  * 
+* MAPS.                                                       * 
+*************************************************************** 
+                                                                  
+ 0300-RETURN-CICS. 
+                                                                  
+     EXEC CICS 
+         RETURN TRANSID ('LOGP') 
+         COMMAREA(TRANSACTION) 
+     END-EXEC. 
+                                                                  
+*************************************************************** 
+* 0400-RECEIVE-MAP.                                           * 
+*                                                             * 
+* IT RECEIVES THE USER INFORMATION TO BE PROCESSED            * 
+*************************************************************** 
+                                                                  
+ 0400-REECEIVE-MAP. 
+                                                                  
+     EXEC CICS 
+         RECEIVE MAP('LOGON') MAPSET('LOGINMP') 
+     END-EXEC. 
+                                                                  
+*************************************************************** 
+* 0500-PROCESS-LOGIN.                                         * 
+*                                                             * 
+* IN THE LOGIN MAP ITS NECESSARY TO VERIFY THE LOGIN AND THE  * 
+* PASSWORD, IF THEY ARE CORRECT THE PROGRAM WILL VERIFY WHICH * 
+* DEPARTMENT THE EMPLOYEE BELONGS TO SEND HIM TO THE CORRECT  * 
+* MAP                                                         * 
+*************************************************************** 
+                                                                  
+ 0500-PROCESS-LOGIN. 
+                                                                  
+     PERFORM 0510-GET-LOGIN. 
+     PERFORM 0520-PROCESS-DATA. 
+                                                                  
+*************************************************************** 
+* 0510-GET-LOGIN.                                             * 
+*                                                             * 
+* THIS PARAGRAPH GETS THE USERID AND THE PASSWORD AND VERIFY  * 
+* IF THEY ARE CORRECT. FOR GET MORE INFORMATIONS ABOUT THE    * 
+* CRYPTOGRAPHY METHOD GO TO THE CRYPTO PROGRAM CALL HERE.     * 
+*************************************************************** 
+                                                                  
+ 0510-GET-LOGIN. 
+                                                                  
+     MOVE USERIDI TO WS-USERID 
+     MOVE PASSWI TO WS-PASSWORD 
+                                                                  
+     EXEC SQL 
+         SELECT ADMIDATE, DEPTID 
+         INTO :WS-ADMIDATE, :WS-DEPT 
+         FROM EMPLO 
+         WHERE EMPID = :WS-USERID 
+     END-EXEC. 
+                                                                  
+     EVALUATE SQLCODE 
+        WHEN 0 
+            MOVE 1 TO WS-FLAG-RETURN. 
+            MOVE 'CRYPTVE' TO SUBPROGRAM 
+            CALL SUBPROGRAM USING WS-PASSWORD, WS-USERID, WS-ADMID
+                                               WS-FLAG-LS. 
+        WHEN 100 
+            MOVE 1 TO WS-FLAG-RETURN.                                  
+        WHEN OTHER                                                     
+            MOVE 2 TO WS-FLAG-RETURN.                                  
+     ELSE                                                              
+                                                                       
+***************************************************************        
+* 0520-PROCESS-DATA.                                          *        
+*                                                             *        
+* THIS PARAGRAPH ANALYSE THE WS-FLAG-RETURN. THE 0 MEANS      *        
+* USERID AND PASSWORD ARE OK. 1 USERID OR PASSOWERD INVALID   *        
+* 2 ANOTHER ERROR OCCURRED.                                   *        
+***************************************************************        
+                                                                       
+ 0520-PROCESS-DATA.                                                    
+                                                                       
+     EVALUATE WS-FLAG-RETURN                                           
+        WHEN 0                                                         
+            EVALUATE WS-DEPT                                           
+               WHEN 1                                                  
+                   MOVE USERIDI TO USER-ID                             
+                   MOVE 'THE CEO MAP IS NOT AVAIBLE YET' TO MSG1O      
+               WHEN 2 OR 3 OR 4                                        
+                   MOVE USERIDI TO USER-ID                             
+                   MOVE 'THE CREW MAP IS NOT AVAIBLE YET' TO MSG1O     
+               WHEN 5                                                  
+                   MOVE USERIDI TO USER-ID                             
+                   MOVE 'THE HR MAP IS NOT AVAIBLE YET' TO MSG1O       
+               WHEN 6                                                  
+                   MOVE USERIDI TO USER-ID                             
+                   MOVE 'THE IT MAP IS NOT AVAIBLE YET' TO MSG1O       
+               WHEN 7                                                  
+                   EXEC CICS XCTL                                      
+                      PROGRAM('SRCHFLI')                               
+                      COMMAREA(WS-COMMAREA)                            
+                      LENGTH(12)                                       
+               WHEN 8 
+                   MOVE USERIDI TO USER-ID 
+                   MOVE 'THE LAWYER MAP IS NOT AVAIBLE YET' 
+                                                       TO MSG1O 
+               WHEN 9 
+                   MOVE USERIDI TO USER-ID 
+                   MOVE 'THE SCHEDULE MAP IS NOT AVAIBLE YET' 
+                                                       TO MSG1O 
+            END-EVALUATE 
+        WHEN 1 
+            MOVE 'PASSWORD OR USERID INCORRECT.' TO MSG1O. 
+        WHEN 2 
+        MOVE 'COMMUNICATION ERROR IN THE SYSTEM CALL THE IT DEPT'
+                                TO MSG1O 
+            MOVE 'COMMUNICATE THE FOLLOW CODE ERROR: ' 
+                                TO MSG2O 
+            MOVE WS-FLAG-ERROR TO MSG2O(37:10) 
+     END-EVALUATE. 
+                                                                                        

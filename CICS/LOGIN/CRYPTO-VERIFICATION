@@ -1,0 +1,259 @@
+******************************************************************  
+* PROGRAM NAME                 : CRYPTVE                         *  
+* IMPORTANT FILE               : PASSDOC                         *  
+* PROGRAMMER                   : KERESTES                        *  
+* DATE OF WRITEN               : SEPT. 2022                      *  
+* TECHNOLOGY                   : CICS + COBOL + DB2              *  
+******************************************************************  
+*                   PROBLEM  DEFINITION                          *  
+*                                                                *  
+* THIS PROGRAM MAKE THE PASSWORD ENCRYPTATION                    *  
+******************************************************************  
+* INPUT PARAMETERS:                                              *  
+*                                                                *  
+* PASSWORD, CLIENTID, ADMINDATE                                  *  
+******************************************************************  
+* OUTPUT PARAMETERS:                                             *  
+*                                                                *  
+* CONFIRMATION OF THE ENCRYPTED PASSWORD                         *  
+******************************************************************  
+                                                                    
+******************************************************************  
+*                  IDENTIFICATION DIVISION.                      *  
+******************************************************************  
+                                                                    
+ IDENTIFICATION                      DIVISION.                      
+ PROGRAM-ID. CRYPTVE.                                               
+                                                                    
+******************************************************************  
+*                     ENVIRONMENT DIVISION.                      *  
+******************************************************************  
+                                                                    
+ ENVIRONMENT                               DIVISION.                
+                                                                    
+*---------------------*                                             
+ INPUT-OUTPUT SECTION.                                              
+*---------------------* 
+                                                                  
+ FILE-CONTROL. 
+                                                                  
+     SELECT PASSFILE ASSIGN TO PASSDOC 
+     ORGANIZATION IS SEQUENTIAL 
+     FILE STATUS IS FS-PASSFILE. 
+                                                                  
+******************************************************************
+*                       DATA  DIVISION.                          *
+******************************************************************
+                                                                  
+ DATA                                DIVISION. 
+                                                                  
+*-------------* 
+ FILE SECTION. 
+*-------------* 
+                                                                  
+ FD PASSFILE. 
+                                                                  
+ 01 TOTFILE. 
+     02  FILE-USERID    PIC X(8). 
+     02  FILE-PASS      PIC X(8). 
+     02  FILLER         PIC X(4). 
+                                                                  
+*------------------------* 
+ WORKING-STORAGE SECTION. 
+*------------------------* 
+                                                                  
+ 01  FS-PASSFILE                      PIC X(2). 
+     88  FS-PASSFILE-OK               VALUE '00'. 
+                                                                  
+ 01  PASSFILE-KEY                     PIC 9(9) VALUE 0. 
+                                                                  
+ 01  WS-DATE             PIC 9(8). 
+                                                                  
+ 01  WS-USERID1          PIC 9(4) COMP.                             
+ 01  WS-USERID REDEFINES WS-USERID1 PIC X(2).                       
+                                                                    
+ 01  WS-PASS             PIC 9(4) COMP.                             
+ 01  WS-PASSWORD REDEFINES WS-PASS PIC X(2).                        
+                                                                    
+ 01  WS-KEY1             PIC 9(4) COMP.                             
+ 01  WS-KEY REDEFINES WS-KEY1 PIC 9(2).                             
+                                                                    
+ 01  WS-COUNTER1         PIC 9(2).                                  
+ 01  WS-COUNTER2         PIC 9(2).                                  
+                                                                    
+ 01  WS-MOD1             PIC 9.                                     
+                                                                    
+ 01  WS-CRYPTPASS.                                                  
+     02  WS-CRYPTCHAR    PIC X OCCURS 8 TIMES.                      
+                                                                    
+ 01  READ-FLAG           PIC X(1) VALUE 'N'.                        
+                                                                    
+*----------------*                                                  
+ LINKAGE SECTION.                                                   
+*----------------*                                                  
+                                                                    
+ 01  LS-PASSWORD         PIC X(8).                                  
+ 01  LS-USERID           PIC X(8).                                  
+ 01  LS-ADDATE           PIC X(10).                                 
+ 01  LS-FLAG.                                                       
+     02 LS-FLAG-RETURN   PIC X.                                     
+     02 LS-FLAG-ERROR    PIC X(4).                                  
+*    0 = OK, 1 = INVALID, 2 = ERROR                                 
+                                                                    
+**************************************************************      
+*           PROCEDURE DIVISION WITH LINKAGE SECTION          *      
+**************************************************************      
+                                                                    
+ PROCEDURE DIVISION USING LS-PASSWORD, LS-USERID, LS-ADDATE,        
+                                        LS-FLAG.                    
+                                                                    
+ MAIN-PARA.                                                         
+                                                                    
+     PERFORM 0100-OPEN-FILE.                                        
+     PERFORM 0200-CRYPTPASS.                                        
+     PERFORM 0300-COMPARE-PASS.                                     
+     PERFORM 0400-CLOSE-FILE.                                       
+                                                                    
+     GOBACK.                                                        
+                                                                    
+*****************************************************************   
+* 0100-OPEN-FILE.                                               *   
+*                                                               *   
+* IT OPENS THE FILE TO PUT THE ENCRYPTED PASSWORD.              *   
+*****************************************************************   
+                                                                    
+ 0100-OPEN-FILE.                                                    
+                                                                    
+     OPEN INPUT PASSFILE                                            
+                                                                    
+     IF NOT FS-PASSFILE-OK                                          
+         MOVE 2 TO LS-FLAG-RETURN                                   
+         MOVE FS-PASSFILE TO LS-FLAG-ERROR                          
+         GO TO 0400-CLOSE-FILE                                      
+     END-IF.                                                        
+                                                                    
+***************************************************************     
+* 0200-CRYPTPASS.                                             *     
+*                                                             *     
+* IT MAKES THE PASSWORD ENCRYPTATION TO COMPARE WITH THE STORE*     
+* ENCRYPTED PASSWORD.                                         *     
+***************************************************************     
+                                                                    
+ 0200-CRYPTPASS.                                                    
+                                                                    
+     MOVE LS-USERID(6:3) TO PASSFILE-KEY                            
+     ADD 1 TO PASSFILE-KEY                                          
+     MOVE LS-ADDATE(1:4) TO WS-DATE(1:4)                            
+     MOVE LS-ADDATE(6:2) TO WS-DATE(5:2)                            
+     MOVE LS-ADDATE (9:2) TO WS-DATE(7:2)                           
+                                                                    
+     INITIALIZE WS-CRYPTPASS.                                       
+                                                                    
+     COMPUTE WS-KEY = FUNCTION RANDOM (WS-DATE) * 1000              
+                                                                    
+     MOVE LS-USERID(1:4) TO WS-USERID                               
+                                                                    
+     PERFORM WITH TEST BEFORE VARYING WS-COUNTER1 FROM 1 BY 1       
+                        UNTIL WS-COUNTER1 > 8 OR                    
+                        LS-PASSWORD(WS-COUNTER1:1) = SPACE          
+                                                                    
+         PERFORM WITH TEST AFTER VARYING WS-COUNTER2 FROM           
+                               WS-COUNTER1 BY 1 UNTIL               
+                   WS-CRYPTCHAR(WS-COUNTER1) NOT = X'40'  AND       
+                   WS-CRYPTCHAR(WS-COUNTER1) NOT = X'10'  AND       
+                   WS-CRYPTCHAR(WS-COUNTER1) NOT = X'00'  AND       
+                   WS-CRYPTCHAR(WS-COUNTER1) NOT = X'30'  AND       
+                   WS-CRYPTCHAR(WS-COUNTER1) NOT = X'20'            
+                                                                    
+         COMPUTE WS-MOD1 = FUNCTION MOD(WS-COUNTER2 3)              
+                                                                    
+         MOVE LS-PASSWORD(WS-COUNTER1:2) TO WS-PASSWORD             
+         MOVE LS-USERID(WS-COUNTER1:2) TO WS-USERID                 
+                                                                    
+         EVALUATE WS-MOD1                                           
+            WHEN 0                                                  
+                COMPUTE WS-KEY1 = WS-PASS * WS-KEY1                 
+                                                                    
+                MOVE WS-KEY1 TO WS-PASS                             
+                MOVE WS-PASSWORD(2:1) TO WS-CRYPTCHAR(WS-COUNTER1)  
+                                                                    
+            WHEN 1                                                    
+                COMPUTE WS-USERID1 = WS-PASS * WS-USERID1             
+                                                                      
+                MOVE WS-USERID(2:1) TO WS-CRYPTCHAR(WS-COUNTER1)      
+                                                                      
+            WHEN 2                                                    
+             COMPUTE  WS-KEY1 = WS-PASS * WS-USERID1 * WS-KEY1        
+                                                                      
+                MOVE WS-KEY1 TO WS-PASS                               
+                MOVE WS-PASSWORD(2:1) TO WS-CRYPTCHAR(WS-COUNTER1)    
+                                                                      
+         END-EVALUATE                                                 
+                                                                      
+         END-PERFORM                                                  
+                                                                      
+     END-PERFORM.                                                     
+                                                                      
+*****************************************************************     
+* 0300-COMPARE-PASS                                             *     
+*                                                               *     
+* IT MAKES THE COMPARATION BETWEEN THE STORED PASSWORD AND THE  *     
+* PASSWORD ENCRYPTED BY THIS PROGRAM.                           *     
+*****************************************************************     
+                                                                      
+ 0300-COMPARE-PASS.                                                   
+                                                                      
+     DISPLAY WS-CRYPTPASS                                             
+     DISPLAY LS-USERID                                                
+                                                                      
+     MOVE 9 TO LS-FLAG-RETURN                                         
+                                                                      
+     READ PASSFILE                                                    
+         AT END MOVE 'Y' TO READ-FLAG                                 
+     END-READ                                                         
+                                                                      
+     IF NOT FS-PASSFILE-OK                                            
+        MOVE 2 TO LS-FLAG-RETURN                                    
+        MOVE FS-PASSFILE TO LS-FLAG-ERROR                           
+        GO TO 0400-CLOSE-FILE                                       
+     END-IF                                                         
+                                                                    
+     PERFORM UNTIL READ-FLAG = 'Y' OR NOT FS-PASSFILE-OK            
+        IF LS-USERID = FILE-USERID                                  
+           MOVE 'Y' TO READ-FLAG                                    
+           MOVE 0 TO LS-FLAG-RETURN                                 
+        ELSE                                                        
+           READ PASSFILE                                            
+               AT END MOVE 'Y' TO READ-FLAG                         
+           END-READ                                                 
+        END-IF                                                      
+     END-PERFORM                                                    
+                                                                    
+     IF LS-FLAG-RETURN = 0                                          
+        IF WS-CRYPTPASS NOT = FILE-PASS                             
+           MOVE 1 TO LS-FLAG-RETURN                                 
+        END-IF                                                      
+     ELSE                                                           
+        IF FS-PASSFILE-OK                                           
+           MOVE 1 TO LS-FLAG-RETURN                                 
+        ELSE                                                        
+           MOVE 2 TO LS-FLAG-RETURN                                 
+           MOVE FS-PASSFILE TO LS-FLAG-ERROR                        
+           GO TO 0400-CLOSE-FILE                                    
+        END-IF                                                      
+     END-IF.                                                        
+                                                                    
+***************************************************************     
+* 0400-CLOSE-FILE                                             *     
+*                                                             *     
+* IT CLOSES THE PS FILE                                       *     
+***************************************************************     
+                                                                    
+  0400-CLOSE-FILE. 
+                                                                  
+     CLOSE PASSFILE 
+                                                                  
+     IF NOT FS-PASSFILE-OK 
+        MOVE 2 TO LS-FLAG-RETURN 
+        MOVE FS-PASSFILE TO LS-FLAG-ERROR 
+     END-IF.                                                                  
