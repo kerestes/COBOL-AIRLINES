@@ -1,0 +1,39 @@
+      ****************************************************************
+      * DCLGEN TABLE(AIRPORT)                                        *
+      *        LIBRARY(Z13896.PROJ1.DCLGEN(AIRPORT))                 *
+      *        ACTION(ADD)                                           *
+      *        LANGUAGE(COBOL)                                       *
+      *        QUOTE                                                 *
+      * ... IS THE DCLGEN COMMAND THAT MADE THE    STATEMENTS        *
+      ****************************************************************
+           EXEC SQL DECLARE AIRPORT TABLE 
+           (AIRPORTID                       CHAR(4) NOT NULL, 
+            NAME                            VARCHAR(100) NOT NULL, 
+            ADDRESS                         VARCHAR(250) NOT NULL, 
+            CITY                            VARCHAR(30) NOT NULL, 
+            COUNTRY                         VARCHAR(30) NOT NULL, 
+            ZIPCODE                         VARCHAR(15) NOT NULL 
+           ) END-EXEC. 
+      ****************************************************************
+      * COBOL DECLARATION FOR TABLE AIRPORT                          *
+      ****************************************************************
+       01  DCLAIRPORT. 
+           10 AIR-AIRPORTID               PIC X(4). 
+           10 AIR-NAME. 
+              49 AIR-NAME_LEN             PIC 9(4) USAGE COMP. 
+              49 AIR-NAME_TEXT            PIC X(100). 
+           10 AIR-ADDRESS. 
+              49 AIR-ADDRESS_LEN          PIC 9(4) USAGE COMP. 
+              49 AIR-ADDRESS_TEXT         PIC X(250). 
+           10 AIR-CITY. 
+              49 AIR-CITY_LEN             PIC 9(4) USAGE COMP. 
+              49 AIR-CITY_TEXT            PIC X(30). 
+           10 AIR-COUNTRY. 
+              49 AIR-COUNTRY_LEN          PIC 9(4) USAGE COMP. 
+              49 AIR-COUNTRY_TEXT         PIC X(30). 
+           10 AIR-ZIPCODE. 
+              49 AIR-ZIPCODE_LEN          PIC 9(4) USAGE COMP. 
+              49 AIR-ZIPCODE_TEXT         PIC X(15). 
+      **************************************************************** 
+      * THE NUMBER OF COLUMNS DESCRIBED BY THIS DECLARATION IS 6     * 
+      **************************************************************** 
