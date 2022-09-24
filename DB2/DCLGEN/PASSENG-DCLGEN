@@ -1,0 +1,51 @@
+      ****************************************************************
+      * DCLGEN TABLE(PASSENGERS)                                     *
+      *        LIBRARY(Z13896.PROJ1.DCLGEN(PASSENG))                 *
+      *        ACTION(ADD)                                           *
+      *        LANGUAGE(COBOL)                                       *
+      *        QUOTE                                                 *
+      * ... IS THE DCLGEN COMMAND THAT MADE THE    STATEMENTS        *
+      ****************************************************************
+           EXEC SQL DECLARE PASSENGERS TABLE 
+           (CLIENTID                        INT NOT NULL, 
+            FIRSTNAME                       VARCHAR(30) NOT NULL, 
+            LASTNAME                        VARCHAR(30) NOT NULL, 
+            ADDRESS                         VARCHAR(250) NOT NULL, 
+            CITY                            VARCHAR(50) NOT NULL, 
+            COUNTRY                         VARCHAR(30) NOT NULL, 
+            ZIPCODE                         VARCHAR(15) NOT NULL, 
+            TELEPHONE                       VARCHAR(18) NOT NULL, 
+            EMAIL                           VARCHAR(100) NOT NULL 
+           ) END-EXEC. 
+      ****************************************************************
+      * COBOL DECLARATION FOR TABLE PASSENG                          *
+      ****************************************************************
+       01  DCLPASSENGERS. 
+           10 PA-CLIENTID               PIC S9(9) USAGE COMP. 
+           10 PA-FIRSTNAME. 
+              49 PA-FIRSTNAME_LEN       PIC 9(4) USAGE COMP. 
+              49 PA-FIRSTNAME_TEXT      PIC X(30). 
+           10 PA-LASTNAME. 
+              49 PA-LASTNAME_LEN        PIC 9(4) USAGE COMP. 
+              49 PA-LASTNAME_TEXT       PIC X(30). 
+           10 PA-ADDRESS. 
+              49 PA-ADDRESS_LEN         PIC 9(4) USAGE COMP. 
+              49 PA-ADDRESS_TEXT        PIC X(250). 
+           10 PA-CITY. 
+              49 PA-CITY_LEN            PIC 9(4) USAGE COMP. 
+              49 PA-CITY_TEXT           PIC X(50). 
+           10 PA-COUNTRY. 
+              49 PA-COUNTRY_LEN         PIC 9(4) USAGE COMP. 
+              49 PA-COUNTRY_TEXT        PIC X(30). 
+           10 PA-ZIPCODE. 
+              49 PA-ZIPCODE_LEN         PIC 9(4) USAGE COMP. 
+              49 PA-ZIPCODE_TEXT        PIC X(15). 
+           10 PA-TELEPHONE. 
+              49 PA-TELEPHONE_LEN       PIC 9(4) USAGE COMP. 
+              49 PA-TELEPHONE_TEXT      PIC X(18). 
+           10 PA-EMAIL. 
+              49 PA-EMAIL_LEN           PIC 9(4) USAGE COMP. 
+              49 PA-EMAIL_TEXT          PIC X(100). 
+      **************************************************************** 
+      * THE NUMBER OF COLUMNS DESCRIBED BY THIS DECLARATION IS 9     * 
+      **************************************************************** 

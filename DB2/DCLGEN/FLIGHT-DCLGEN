@@ -1,0 +1,39 @@
+      ****************************************************************
+      * DCLGEN TABLE(FLIGHT)                                         *
+      *        LIBRARY(Z13896.PROJ1.DCLGEN(FLIGHT))                  *
+      *        ACTION(ADD)                                           *
+      *        LANGUAGE(COBOL)                                       *
+      *        QUOTE                                                 *
+      * ... IS THE DCLGEN COMMAND THAT MADE THE    STATEMENTS        *
+      ****************************************************************
+           EXEC SQL DECLARE FLIGHT TABLE 
+           (FLIGHTID                        INT NOT NULL, 
+            FLIGHTDATE                      DATE NOT NULL, 
+            DEPTIME                         TIME NOT NULL, 
+            ARRTIME                         TIME NOT NULL, 
+            TOTPASS                         INT NOT NULL, 
+            TOTBAGGA                        INT NOT NULL, 
+            FLIGHTNUM                       CHAR(6) NOT NULL, 
+            SHIFTID                         INT NOT NULL, 
+            AIRPLANEID                      CHAR(8) NOT NULL, 
+            AIRPORTDEP                      CHAR(4) NOT NULL, 
+            AIRPORTARR                      CHAR(4) NOT NULL 
+           ) END-EXEC. 
+      ****************************************************************
+      * COBOL DECLARATION FOR TABLE FLIGHT                           *
+      ****************************************************************
+       01  DCLFLIGHT. 
+           10 FLIGHTID                  PIC S9(9) USAGE COMP. 
+           10 FLIGHTDATE                PIC X(10). 
+           10 DEPTIME                   PIC X(8). 
+           10 ARRTIME                   PIC X(8). 
+           10 TOTPASS                   PIC S9(9) USAGE COMP. 
+           10 TOTBAGGA                  PIC S9(9) USAGE COMP. 
+           10 FLIGHTNUM                 PIC X(6). 
+           10 SHIFTID                   PIC S9(9) USAGE COMP. 
+           10 AIRPLANEID                PIC X(8). 
+           10 AIRPORTDEP                PIC X(4). 
+           10 AIRPORTARR                PIC X(4). 
+      ****************************************************************
+      * THE NUMBER OF COLUMNS DESCRIBED BY THIS DECLARATION IS 9     *
+      ****************************************************************

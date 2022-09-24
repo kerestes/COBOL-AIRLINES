@@ -1,0 +1,27 @@
+      **************************************************************** 
+      * DCLGEN TABLE(TICKET)                                         * 
+      *        LIBRARY(Z13896.PROJ1.DCLGEN(TICKET))                  *
+      *        ACTION(ADD)                                           * 
+      *        LANGUAGE(COBOL)                                       * 
+      *        QUOTE                                                 * 
+      * ... IS THE DCLGEN COMMAND THAT MADE THE    STATEMENTS        * 
+      **************************************************************** 
+           EXEC SQL DECLARE TICKET TABLE 
+           (TICKETID                        CHAR(10) NOT NULL, 
+            BUYID                           INT NOT NULL, 
+            CLIENTID                        INT NOT NULL, 
+            FLIGHTID                        INT NOT NULL, 
+            SEATNUM                         CHAR(3) NOT NULL 
+           ) END-EXEC. 
+      **************************************************************** 
+      * COBOL DECLARATION FOR TABLE TICKET                           * 
+      **************************************************************** 
+       01  DCLTICKET. 
+           10 TICKETID                  PIC X(10). 
+           10 BUYID                     PIC S9(9) USAGE COMP 
+           10 CLIENTID                  PIC S9(9) USAGE COMP. 
+           10 FLIGHTID                  PIC S9(9) USAGE COMP. 
+           10 SEATNUM                   PIC X(3). 
+      **************************************************************** 
+      * THE NUMBER OF COLUMNS DESCRIBED BY THIS DECLARATION IS 5     * 
+      **************************************************************** 

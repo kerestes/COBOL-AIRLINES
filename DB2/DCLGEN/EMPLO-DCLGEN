@@ -1,0 +1,53 @@
+      ****************************************************************
+      * DCLGEN TABLE(EMPLO)                                          *
+      *        LIBRARY(Z13896.PROJ1.DCLGEN(EMP))                     *
+      *        ACTION(ADD)                                           *
+      *        LANGUAGE(COBOL)                                       *
+      *        QUOTE                                                 *
+      * ... IS THE DCLGEN COMMAND THAT MADE THE    STATEMENTS        *
+      ****************************************************************
+           EXEC SQL DECLARE EMPLO TABLE 
+           (EMPID                           CHAR(8) NOT NULL, 
+            FIRSTNAME                       VARCHAR(30) NOT NULL, 
+            LASTNAME                        VARCHAR(30) NOT NULL, 
+            ADDRE                           VARCHAR(100) NOT NULL, 
+            CITY                            VARCHAR(50) NOT NULL, 
+            ZIPCODE                         VARCHAR(15) NOT NULL, 
+            TELEPHONE                       VARCHAR(10) NOT NULL, 
+            EMAIL                           VARCHAR(100) NOT NULL, 
+            ADMIDATE                        DATE NOT NULL, 
+            SALARY                          DEC(8,2) NOT NULL, 
+            DEPTID                          INT NOT NULL 
+           ) END-EXEC. 
+      ****************************************************************
+      * COBOL DECLARATION FOR TABLE EMPLO                            *
+      ****************************************************************
+       01  DCLEMPLO. 
+           10 EMPID                    PIC X(8). 
+           10 FIRSTNAME. 
+              49 FIRSTNAME_LEN         PIC 9(4) USAGE COMP. 
+              49 FIRSTNAME_TEXT        PIC X(30). 
+           10 LASTNAME. 
+              49 LASTNAME_LEN          PIC 9(4) USAGE COMP. 
+              49 LASTNAME_TEXT         PIC X(30). 
+           10 ADDRE. 
+              49 ADDRE_LEN             PIC 9(4) USAGE COMP. 
+              49 ADDRE_TEXT            PIC X(100). 
+           10 CITY. 
+              49 CITY_LEN              PIC 9(4) USAGE COMP. 
+              49 CITY_TEXT             PIC X(50). 
+           10 ZIPCODE. 
+              49 ZIPCODE_LEN           PIC 9(4) USAGE COMP. 
+              49 ZIPCODE_TEXT          PIC X(15). 
+           10 TELEPHONE. 
+              49 TELEPHONE_LEN          PIC 9(4) USAGE COMP. 
+              49 TELEPHONE_TEXT         PIC X(10). 
+           10 EMAIL. 
+              49 EMAIL_LEN              PIC 9(4) USAGE COMP. 
+              49 EMAIL_TEXT             PIC X(100). 
+           10 ADMIDATE                  PIC X(10). 
+           10 SALARY                    PIC S9(6)V9(2) USAGE COMP-3. 
+           10 DEPTID                    PIC S9(9) USAGE COMP. 
+      ****************************************************************
+      * THE NUMBER OF COLUMNS DESCRIBED BY THIS DECLARATION IS 11    *
+      ****************************************************************
