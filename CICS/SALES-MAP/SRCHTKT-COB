@@ -508,7 +508,11 @@
                                                                   
         WHEN DFHPF6 
                                                                   
-            MOVE 'THIS MAP IS NOT READY YET' TO MSG1O 
+            EXEC CICS XCTL 
+                 PROGRAM('SELLCOB1') 
+                 COMMAREA(WS-COMMAREA)
+                 LENGTH(12) 
+            END-EXEC 
                                                                   
         WHEN DFHPF7 
                                                                   
