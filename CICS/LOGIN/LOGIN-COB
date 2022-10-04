@@ -202,7 +202,7 @@
 * IT RECEIVES THE USER INFORMATION TO BE PROCESSED            * 
 *************************************************************** 
                                                                   
- 0400-REECEIVE-MAP. 
+ 0400-RECEIVE-MAP. 
                                                                   
      EXEC CICS 
          RECEIVE MAP('LOGON') MAPSET('LOGINMP') 
