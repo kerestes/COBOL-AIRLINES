@@ -1,0 +1,17 @@
+         RECEIPT
+ 
+ BUYID
+ CB/CS/CH
+ Le DD/MM/YYYY a HH:MM:SS
+ COBOL AIRLINES
+ PARIS
+ 75000
+ *******
+ ---------------------------
+ 
+ MONTANT =             EUR  
+ 
+ DEBIT/CREDIT
+ 
+     TICKET CLIENT
+        TO KEEP

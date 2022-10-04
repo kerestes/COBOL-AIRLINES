@@ -1,0 +1,129 @@
+****************************************************************        
+* PROGRAM NAME                 : PRINTPA.                      *        
+* IMPORTANT FILE               : PRINT RECEIPT                 *        
+* PROGRAMMER                   : KERESTES                      *        
+* DATE OF WRITEN               : OCT. 2022                     *        
+* TECHNOLOGY                   : COBOL + JCL                   *        
+****************************************************************        
+*                   PROBLEM  DEFINITION                        *        
+*                                                              *        
+*   THE PROGRAM RECEIVE THE SELL INFORMATION AND CREATE        *        
+*                  THE PRINT RECEIPT                           *        
+****************************************************************        
+* INPUT PARAMETERS:                                            *        
+*                                                              *        
+* SELL INFORMATION - ACCEPT STATEMENT                          *        
+****************************************************************        
+* OUTPUT PARAMETERS:                                           *        
+*                                                              *        
+* PRINT RECEIPT.                                               *        
+****************************************************************        
+                                                                        
+****************************************************************        
+*                  IDENTIFICATION DIVISION.                    *        
+****************************************************************        
+                                                                        
+ IDENTIFICATION DIVISION.                                               
+ PROGRAM-ID. PRINTPA.                                                   
+                                                                        
+****************************************************************        
+*                       DATA DIVISION.                         *        
+****************************************************************        
+                                                                        
+ DATA DIVISION.                                                         
+                                                                        
+*------------------------*                                              
+ WORKING-STORAGE SECTION.                                               
+*------------------------*                                              
+                                                                        
+****************************************************************        
+*                         WS VARAIBLES                         *        
+****************************************************************        
+                                                                        
+ 01  TABLE-PRINT.                                                       
+     02 PRINT-BUYID                 PIC $$$$9.99.                       
+     02 PRINT-TOTPRICE              PIC 9(5)V9(2).                      
+                                                                        
+ 01  WS-TIME.                                                           
+     02 WS-DATE.                                                        
+        03 WS-YEAR                  PIC 9(4).                           
+        03 WS-MONTH                 PIC 9(2).                           
+        03 WS-DAY                   PIC 9(2).                           
+     02 WS-HOUR.                                                        
+        03 WS-HOUR                  PIC 9(2).                           
+        03 WS-MINUTE                PIC 9(2).                           
+        03 WS-SECOND                PIC 9(2).                           
+                                                                        
+****************************************************************        
+*                     PROCEDURE DIVISION.                      *        
+****************************************************************        
+                                                                        
+ PROCEDURE DIVISION.                                                    
+                                                                        
+ MAIN-PARA.                                                             
+                                                                        
+     PERFORM 0100-ACCEPT                                                
+     PERFORM 0200-GET-TIME                                              
+     PERFORM 0300-DISPLAY                                               
+                                                                        
+     GOBACK.                                                            
+                                                                        
+****************************************************************        
+* 0100-ACCEPT                                                  *        
+*                                                              *        
+* ACCEPT THE DATA FROM A JCL JOB                               *        
+****************************************************************        
+                                                                        
+ 0100-ACCEPT.                                                           
+                                                                        
+     ACCEPT PRINT-BUYID                                                 
+     ACCEPT PRINT-TOTPRICE.                                             
+                                                                        
+****************************************************************        
+* 0200-GET-TIME                                                         
+*                                                                       
+* HERE WE CAN ACCEPT THE TIME INFORMATION FROM THE CICS PROGRAM*        
+* OR GET THOSE INFORMATIONS FROM COBOL FUNCTION CURRENT DATE   *        
+* BUT ITS BETTER GET THOSE INFORMTATIONS FROM CICS TO AVOID    *        
+* MISUNDERSTOOD ABOUT TIME. BY THE WAY I WILL GET THE TIME     *        
+* FROM COBOL TO TRAINING MYSELF.                               *        
+***************************************************************         
+                                                                        
+ 0200-GET-TIME.                                                         
+                                                                        
+     MOVE FUNCTION CURRENT-DATE TO WS-TIME.                             
+                                                                        
+                                                                        
+****************************************************************        
+* 0300-DISPLAY                                                 *        
+*                                                              *        
+* IT DISPLAY THE RECEIPT                                       *        
+* THE JOB WHICH WILL CALL THIS PROGRAM MUST CHOOSE THE PRINTER *        
+* MSGCLASS ( JOB MSGCLASS=PRINTER) DEFINED BY THE ADMINSTRATOR *        
+****************************************************************        
+                                                                        
+ 0300-DISPLAY.                                                          
+                                                                        
+     DISPLAY '           RECEIPT'                                       
+     DISPLAY ' '.                                                       
+     DISPLAY PRINT-BUYID                                                
+                                                                        
+* THE PAYEMENT METHOD IS NOT YET BEEN IMPLEMENTED. BECAUSE OF           
+* THAT THE PROGRAM WILL NOT CHOOSE A SPECIFIC PAYMENT METHOD            
+                                                                        
+     DISPLAY 'CB/CS/CH'                                                 
+     DISPLAY 'COBOL AIRLINES'                                           
+     DISPLAY 'PARIS'                                                    
+     DISPLAY '75000'                                                    
+                                                                        
+* THIS FILD IS RESERVED TO PRINT A PARTIAL CARD NUMBER                  
+                                                                        
+     DISPLAY '**********'                                               
+     DISPLAY '------------------------------'                           
+     DISPLAY ' '                                                        
+     DISPLAY 'MONTANT = ' PRINT-TOTPRICE '  EUR'                        
+     DISPLAY ' '                                                        
+     DISPLAY 'DEBIT/CREDIT'                                             
+     DISPLAY ' '                                                        
+     DISPLAY '     TICKET CLIENT'                                       
+     DISPLAY '        TO KEEP'.                                         
