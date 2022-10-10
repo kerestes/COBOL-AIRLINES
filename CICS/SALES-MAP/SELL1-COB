@@ -1,0 +1,482 @@
+**************************************************************** 
+* PROGRAM NAME                 : SELLCOB1                      * 
+* IMPORTANT FILE               : DB2 TABLE PASSENGERS, FLIGHT  * 
+* PROGRAMMER                   : KERESTES                      * 
+* DATE OF WRITEN               : OCT. 2022                     * 
+* TECHNOLOGY                   : CICS + COBOL + DB2            * 
+**************************************************************** 
+*                   PROBLEM  DEFINITION                        * 
+*                                                              * 
+* SEARCH A FLIGHT AND A PASSENGERS TO REALISE A SELL           * 
+**************************************************************** 
+* INPUT PARAMETERS:                                            * 
+*                                                              * 
+* CLIENTID, FLIGHTNUM, DATE, AND PASSENGERS NUMBERS            * 
+**************************************************************** 
+* OUTPUT PARAMETERS:                                           * 
+*                                                              * 
+* CALL SELLMAP2 TO FINALIZE THE SELL                           * 
+**************************************************************** 
+                                                                  
+**************************************************************** 
+*                  IDENTIFICATION DIVISION.                    * 
+**************************************************************** 
+                                                                  
+ IDENTIFICATION DIVISION. 
+ PROGRAM-ID. SELLCOB1. 
+                                                                  
+**************************************************************** 
+*                       DATA DIVISION.                         * 
+**************************************************************** 
+                                                                  
+ DATA DIVISION. 
+                                                                  
+*------------------------* 
+ WORKING-STORAGE SECTION. 
+*------------------------* 
+***************************************************************         
+*                      MAPS CICS COPY                         *         
+***************************************************************         
+                                                                        
+ COPY SELLMS.                                                           
+ COPY DFHAID.                                                           
+ COPY DFHBMSCA.                                                         
+                                                                        
+***************************************************************         
+*                       WS VARIABLES                          *         
+***************************************************************         
+                                                                        
+ 01  WS-COMMAREA                                                        
+     02 WS-TRANS                    PIC X(4).                           
+     02 WS-USER-ID                  PIC X(8).                           
+     02 WS-FLIGHTID                 PIC 9(9).
+     02 WS-CLIID                    PIC 9(6).                           
+     02 WS-FNUM                     PIC X(6).                           
+     02 WS-DAIR                     PIC X(3).                           
+     02 WS-LAIR                     PIC X(3).                           
+     02 WS-FDATE                    PIC X(10).                          
+     02 WS-PASSN                    PIC 9(1).                           
+     02 WS-PRICE                    PIC 9(5)V9(2).                      
+     02 WS-TPRICE                   PIC 9(7)V9(2).                      
+                                                                        
+ 01  WS-PRICEV                      PIC 9(5)V9(2).                      
+ 01  WS-TOTPRICE                    PIC 9(7)V9(2).                      
+ 
+ 01  EDIT-PRICE1 REDEFINES WS-PRICEV PIC $$$$9.99.                                                                       
+ 01  EDIT-PRICE REDEFINES WS-TOTPRICE PIC $$$$$$9.99.                   
+                                                                        
+ 01  WS-FLAG                        PIC X VALUE 'N'.                    
+ 01  WS-FLAG-MOUV                   PIC X VALUE 'N'.                    
+                                                                        
+***************************************************************         
+*                    DATE AND TIME CICS                       *         
+***************************************************************         
+                                                                        
+ 01  WS-TSTAMP                    PIC S9(15) COMP-3.                    
+                                                                        
+ 01  WS-DATE                      PIC X(10).                            
+ 01  WS-TIME.                                                           
+     02 WS-HOUR                   PIC 9(2).                             
+     02 FILLER                    PIC X(1).                             
+     02 WS-MINUTE                 PIC 9(2).                             
+     02 FILLER                    PIC X(1).                             
+     02 WS-SECOND                 PIC 9(2).                             
+                                                                        
+*****************************************************************       
+*                       SQL DECLARATION                         *       
+*****************************************************************       
+                                                                        
+     EXEC SQL                                                           
+         INCLUDE FLIGHT                                                 
+     END-EXEC                                                           
+                                                                        
+     EXEC SQL                                                           
+         INCLUDE PASSENG                                                
+     END-EXEC                                                           
+                                                                        
+     EXEC SQL                                                           
+         INCLUDE SQLCA                                                  
+     END-EXEC                                                           
+                                                                        
+*----------------*                                                      
+ LINKAGE SECTION.                                                       
+*----------------*                                                      
+                                                                        
+ 01  DFHCOMMAREA.                                                       
+     02 TRANSACTION     PIC X(4).                                       
+     02 USER-ID         PIC X(8).       
+     02 COMM-FLIGHTID   PIC 9(9).                                
+                                                                        
+***************************************************************         
+*                      PROCEDURE DIVISION.                    *         
+***************************************************************         
+                                                                        
+ PROCEDURE DIVISION.                                                   
+                                                                       
+*****************************************************************      
+* MAIN-PARA.                                                    *      
+*                                                               *      
+* THIS PROGRAM WORKS WITH A PSEUDO-CONVERSATION METHOD.         *      
+* THE MAIN PARAGRAPH SET THE PROCEDURE FLOW WHICH CONTROLS THE  *      
+* SRCHLI MAP.                                                   *      
+*****************************************************************      
+                                                                       
+ MAIN-PARA.                                                            
+                                                                       
+     IF EIBCALEN = 0                                                   
+         PERFORM 0100-GET-DFHCOMMAREA                                  
+         PERFORM 0200-GET-TIME                                         
+         PERFORM 0210-GIVING-TIME                                      
+         PERFORM 0310-MOVE-SPACE                                       
+         PERFORM 0300-SEND-MAP                                         
+         PERFORM 0400-RETURN-CICS                                      
+     ELSE                                                              
+         MOVE SPACE TO MSG1O                                           
+         MOVE SPACE TO MSG2O                                           
+         PERFORM 0500-RECEIVE-MAP                                      
+         PERFORM 0100-GET-DFHCOMMAREA                                  
+         PERFORM 0510-VERIFY-EIBAID                                    
+         PERFORM 0610-VERIFY-SPACE                                     
+                                                                       
+         IF WS-FLAG = 'N'                                              
+                                                                       
+            PERFORM 0600-PROCESS-DATA                                  
+                                                                       
+         END-IF                                                        
+                                                                       
+         PERFORM 0200-GET-TIME                                         
+         PERFORM 0210-GIVING-TIME                                      
+         PERFORM 0300-SEND-MAP                                         
+         PERFORM 0400-RETURN-CICS                                      
+                                                                        
+         MOVE 'N' TO WS-FLAG                                            
+     END-IF.                                                            
+                                                                        
+***************************************************************         
+* 0100-GET-DFHCOMMAREA                                        *         
+*                                                             *         
+* MOVE USER-ID FROM DFHCOMMAREA TO WS-USERID.                 *         
+***************************************************************         
+                                                                        
+ 0100-GET-DFHCOMMAREA.                                                  
+                                                                        
+     MOVE USER-ID TO WS-USER-ID 
+     MOVE WS-USER-ID TO USERIDO                                        
+     MOVE EIBTRMID TO WS-TERMINAL
+     MOVE WS-TERMINAL TO TERMO
+     MOVE COMM-FLIGHTID TO WS-FLIGHTID.                                       
+                                                                        
+***************************************************************         
+* 0200-GET-TIME.                                              *         
+*                                                             *         
+* FOR GET THE TIME WE CAN UTILISE THE CICS METHOD OR THE COBOL*         
+* METHOD IF THE FUNCTION CURRENT-TIME. BUT HERE WE CHOSE THE  *         
+* THE CICS METHOD.                                            *         
+***************************************************************         
+                                                                        
+ 0200-GET-TIME.                                                         
+                                                                        
+     EXEC CICS                                                          
+         ASKTIME                                                        
+         ABSTIME(WS-TSTAMP)                                             
+     END-EXEC                                                           
+                                                                        
+     EXEC CICS                                                          
+         FORMATTIME                                                     
+         ABSTIME(WS-TSTAMP)                                             
+         DATESEP('/')                                                   
+         DDMMYYYY(WS-DATE)                                              
+     END-EXEC                                                           
+                                                                        
+     EXEC CICS                                                          
+         FORMATTIME                                                     
+         ABSTIME(WS-TSTAMP)                                             
+         TIMESEP(':')                                                   
+         TIME(WS-TIME)                                                  
+     END-EXEC.                                                          
+                                                                        
+***************************************************************         
+* 0210-GIVING-TIME.                                           *         
+*                                                             *         
+* AFTER GETTING THE TIME ITS NECESSARY TO TRANSFER THIS INFO  *         
+* TO THE LOGIN MAP ITSELF                                     *         
+***************************************************************         
+                                                                        
+ 0210-GIVING-TIME.                                                      
+                                                                        
+     IF WS-HOUR = 23                                                    
+        MOVE ZEROS TO WS-HOUR                                           
+     ELSE                                                               
+        ADD 1 TO WS-HOUR.                                               
+     END-IF                                                             
+                                                                        
+     MOVE WS-TIME TO LHOURO                                             
+     MOVE WS-DATE TO LDATEO.                                            
+                                                                        
+***************************************************************         
+* 0300-SEND-MAP.                                              *         
+*                                                             *         
+* SEND MAP PROCEDURE IS IMPORTANTE TO CHANGE INFORMATIONS WITH*         
+* THE USER AND IN THE PSEUDO CONVERSATION METHOD.             *         
+***************************************************************         
+                                                                        
+ 0300-SEND-MAP.                                                         
+                                                                        
+     EXEC CICS                                                          
+         SEND MAP('SELLMP') MAPSET('SELLMS') ERASE                      
+     END-EXEC.                                                          
+                                                                        
+***************************************************************         
+* 0310-MOVE-SPACE                                             *         
+*                                                             *         
+* IT MOVE SPACE TO THE MAP'S VARIABLES. IT IS IMPORTANTE TO   *         
+* VERIFY IF ANY INFORMATION WAS INSERT IN IT.                 *         
+***************************************************************         
+                                                                        
+ 0310-MOVE-SPACE.                                                       
+                                                                        
+     MOVE SPACE TO CLIIDI                                               
+     MOVE SPACE TO FNUMI                                                
+     MOVE SPACE TO PASSN.                                               
+                                                                        
+***************************************************************         
+* 0400-RETURN-CICS.                                           *         
+*                                                             *         
+* RETURN LETS THE PROGRAM FREE TO RECEIVE OTHER INFORMATIONS  *         
+* FROM ANOTHER USERS.                                         *         
+* THE COMMUNICATION-AREA IS USED TO SEND INFORMATION BETWEEN  *         
+* MAPS.                                                       *         
+***************************************************************         
+                                                                        
+ 0400-RETURN-CICS.                                                      
+                                                                        
+     EXEC CICS                                                          
+         RETURN TRANSID ('SEL1')                                        
+         COMMAREA(WS-COMMAREA)                                          
+     END-EXEC.                                                          
+                                                                        
+***************************************************************         
+* 0500-RECEIVE-MAP.                                           *         
+*                                                             *         
+* IT RECEIVES THE USER INFORMATION TO BE PROCESSED            *         
+***************************************************************         
+                                                                        
+ 0500-RECEIVE-MAP.                                                      
+                                                                        
+     EXEC CICS                                                          
+         RECEIVE MAP('SELLMP') MAPSET('SELLMS')                         
+     END-EXEC.                                                          
+                                                                        
+***************************************************************         
+* 0510-VERIFY-EIBAID                                          *         
+*                                                             *         
+* IT CHECKS IF THE USER PRESS ANY FKEY WHICH IS REALATED WITH *         
+* ANOTHER MAP OR FUNCTION.                                    *         
+***************************************************************         
+                                                                        
+ 0510-VERIFY-EIBAID.                                                    
+                                                                        
+     EVALUATE EIBAID                                                    
+        WHEN DFHPF3                                                     
+                                                                        
+            EXEC CICS XCTL                                              
+               PROGRAM('LOGIN')                                         
+               COMMAREA(WS-COMMAREA)                                    
+               LENGTH(12)                                               
+            END-EXEC                                                    
+                                                                        
+        WHEN DFHPF4                                                     
+                                                                        
+            EXEC CICS XCTL                                              
+               PROGRAM('SRCHFLY')                                       
+               COMMAREA(WS-COMMAREA)                                    
+               LENGTH(12)                                               
+            END-EXEC                                                    
+                                                                        
+        WHEN DFHPF5                                                     
+                                                                        
+            EXEC CICS XCTL                                              
+               PROGRAM('SRCHTKT')                                       
+               COMMAREA(WS-COMMAREA)                                    
+               LENGTH(12)                                               
+            END-EXEC                                                    
+                                                                        
+        WHEN DFHPF6                                                     
+                                                                        
+            MOVE 'THIS IS THE CURRENT MAP' TO MSG1O                     
+                                                                        
+        WHEN DFHPF7                                                     
+                                                                        
+            MOVE 'THIS MAP IS NOT READY YET' TO MSG1O                   
+                                                                        
+        WHEN DFHPF10                                                    
+                                                                        
+            MOVE 'THIS IS THE CURRENT FUNCTION' TO MSG1O                
+                                                                        
+        WHEN DFHPF12                                                    
+                                                                        
+            IF WS-FLAG-MOUV = 'Y'                                       
+                                                                        
+               MOVE CLIIDI TO WS-CLIID                                  
+               MOVE FNUMI TO WS-FNUM                                    
+               MOVE FDATEI TO WS-FDATE                                  
+               MOVE SDAIRI TO WS-DAIR                                   
+               MOVE SLAIRI TO WS-LAIR                                   
+               MOVE PASSNI TO WS-PASSN                                  
+               MOVE SPRICEI TO WS-PRICE                                 
+               MOVE STPRICEI TO WS-TPRICE                               
+                                                                        
+               EXEC CICS XCTL                                           
+                  PROGRAM('SELLCOB2')                                   
+                  COMMAREA(WS-COMMAREA)                                 
+                  LENGTH(66)                                            
+               END-EXEC                                                 
+                                                                        
+            ELSE                                                        
+                                                                        
+               MOVE 'YOU NEED TO MAKE A VAIBLE REASEARC BEFORE GO       
+                    TO THE SELL SCREEN' TO MSG1O                        
+                                                                        
+            END-IF                                                      
+                                                                        
+     END-EVALUATE.                                                      
+                                                                        
+*************************************************************           
+* 0600-PROCESS-DATA                                         *           
+*                                                           *           
+* THE PROGRAM GET THE INFORMATION FROM THE TABLE FLIGHT AND *           
+* PASSENGERS                                                *           
+*************************************************************           
+                                                                        
+ 0600-PROCESS-DATA.                                                     
+                                                                        
+     MOVE CLIIDI TO PA-CLIENTID                                         
+     MOVE FNUMI TO FLIGHTNUM                                            
+     MOVE FDATEI TO FLIGHTDATE                                          
+                                                                        
+     EXEC SQL                                                           
+         SELECT FIRSTNAME, LASTNAME                                     
+         INTO :PA-FIRSTNAME_TEXT, : PA-LASTNAME_TEXT                    
+         FROM PASSENGERS                                                
+         WHERE CLIENTID = :PA-CLIENTID                                  
+     END-EXEC                                                           
+                                                                        
+     EVALUATE SQLCODE                                                   
+                                                                        
+        WHEN 0                                                          
+                                                                        
+            CONTINUE                                                    
+                                                                        
+        WHEN 100                                                        
+                                                                        
+            MOVE 'THIS PASSENGER DOES NOT EXIST' TO MSG1O               
+            MOVE 'N' TO WS-FLAG-MOUV                                    
+                                                                        
+        WHEN OTHER                                                      
+                                                                        
+            MOVE 'Y' TO WS-FLAG                                         
+            MOVE 'N' TO WS-FLAG-MOUV                                    
+                                                                        
+            MOVE 'THERE WAS A ERROR IN THE RESEARCH PROCESS' TO         
+                                   MSG1O                                
+           MOVE 'CONTACT THE IT DEPARTEMENT AND INFORM THIS CODE:'      
+                                 TO MSG20                               
+                                                                        
+            MOVE SQLCODE TO MSG2O(50:5)                                 
+            MOVE 'AND' TO MSG2O(57:3)                                   
+            MOVE SQLSTATE TO MSG2O(62:5)                                
+                                                                        
+     END-EVALUATE                                                       
+                                                                        
+     IF WS-FLAG = 'N'                                                   
+        EXEC SQL                                                        
+            SELECT FLIGHTID, DEPTIME, ARRTIME, AIRPORTDEP,              
+                   AIRPORTARR                                           
+            INTO :FLIGHTID, :DEPTIME, :ARRTIME, :AIRPORTDEP,            
+                 :AIRPORTARR                                            
+            FROM FLIGHT                                                 
+            WHERE FLIGHTDATE = :FLIGHTDATE AND FLIGHTNUM =              
+                               :FLIGHTNUM                               
+        END-EXEC                                                        
+                                                                        
+        EVALUATE SQLCODE                                                
+                                                                        
+            WHEN 0                                                      
+                                                                        
+                CONTINUE                                                
+                                                                        
+            WHEN 100                                                    
+                                                                        
+                MOVE 'THIS FLIGHT DOES NOT EXIST' TO MSG1O              
+                MOVE 'N' TO WS-FLAG-MOUV                                
+                                                                        
+            WHEN OTHER                                                  
+                                                                        
+                MOVE 'Y' TO WS-FLAG                                     
+                MOVE 'N' TO WS-FLAG-MOUV                                
+                                                                        
+               MOVE 'THERE WAS A ERROR IN THE RESEARCH PROCESS' TO      
+                                   MSG1O                                
+           MOVE 'CONTACT THE IT DEPARTEMENT AND INFORM THIS CODE:'      
+                                 TO MSG20                               
+                                                                        
+                MOVE SQLCODE TO MSG2O(50:5)                             
+                MOVE 'AND' TO MSG2O(57:3)                               
+                MOVE SQLSTATE TO MSG2O(62:5)                            
+                                                                        
+         END-EVALUATE                                                   
+     END-IF                                                             
+                                                                        
+     IF WS-FLAG = 'N'                                                   
+                                                                        
+* IT WILL BE BETTER CALL A PROGRAM TO CALCULATE THE PRICE               
+* BUT THIS PROGRAM IS NOT ALREADY YET                                   
+                                                                        
+         MOVE 'Y' TO WS-FLAG-MOUV                                       
+         MOVE 120.99 TO WS-PRICEV                                        
+         COMPUTE WS-TOTPRICE = WS-PRICEV * PASSNI                        
+                           
+         MOVE FLIGHTID TO WS-FLIGHTID                                                               
+         MOVE FNUMI TO SFNUMO                                           
+         MOVE FDATE TO SFDATEO                                          
+         MOVE DEPTIME TO SDTIMEO                                        
+         MOVE ARRTIME TO SLTIMEO                                        
+         MOVE AIRPORTDEP TO SDAIRO                                      
+         MOVE AIRPORTARR TO SLAIRO                                      
+         MOVE EDIT-PRICE1 TO SPRICEO                                       
+         MOVE EDIT-PRICE TO STPRICEO                                    
+                                                                        
+     END-IF.                                                            
+                                                                        
+****************************************************************        
+* 0610-VERIFY-SPACE                                            *        
+*                                                              *        
+* IT VERIFY IF ALL DATA WAS INSERT IN THE SELL MAP TO LINK     *        
+* CLIENT AND FLIGHT                                            *        
+****************************************************************        
+                                                                        
+ 0610-VERIFY-SPACE.                                                     
+                                                                        
+     IF CLIIDO IS NOT NUMERIC OR CLIENTID = 0                           
+        MOVE 'Y' TO WS-FLAG                                             
+        MOVE 'YOU MUST INSERT A NUMBER IN THE CLIENTID' TO MSG1O        
+     ELSE                                                               
+     IF FNUMO = SPACE                                                   
+        MOVE 'Y' TO WS-FLAG                                             
+        MOVE 'YOU MUST INSERT A CORRECT FIGHT NUMBER' TO MSG1O          
+     ELSE                                                               
+     IF FDATEO(1:4) IS NOT NUMERIC OR FDATEO(6:2) IS NOT NUMERIC        
+        OR FDATEO(9:2) IS NOT NUMERIC OR FFDATEO(5:1) NOT = '-' OR      
+        FDATEO(8:1) NOT = '-'                                           
+                                                                        
+        MOVE 'Y' TO WS-FLAG                                             
+        MOVE 'THE CORRECT DATA FORMAT IS: YYYY-MM-DD' TO MSG1O          
+                                                                        
+     ELSE                                                               
+     IF PASSNO IS NOT NUMERIC OR PASSNO = 0                             
+                                                                        
+        MOVE 'Y' TO WS-FLAG                                             
+        MOVE 'YOU MUST INSERT A NUMBER IN THE NUMBER OF CLIENTS'        
+                        TO MSG1O                                        
+     END-IF.                                                            
+                                                                        
