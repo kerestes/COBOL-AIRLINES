@@ -1,0 +1,15 @@
+                                            UNIQUE      
+     A          R VOL                                   
+     A            VOLID         10S 0                   
+     A            VOLDATE         L                     
+     A            HSORTIE         T                     
+     A            HARRIVEE        T                     
+     A            TOTPASS        4S 0                   
+     A            TOTBAGAGE      4S 0                   
+     A            NBRVOL         6A                     
+     A            PERSOID       10S 0                   
+     A            AVIONID        8A                     
+     A            AERSORTIE      4A                     
+     A            AERARRIVEE     4A                     
+     A          K VOLID                                 
+

@@ -1,0 +1,16 @@
+     A                                      UNIQUE       
+     A          R EMPLOYE                                
+     A            EMPLOYEID     10S 0                    
+     A            PRENOM        30A         VARLEN(10)   
+     A            NOM           30A         VARLEN(10)   
+     A            ADRESSE      250A         VARLEN(50)   
+     A            VILLE         30A         VARLEN(10)   
+     A            PAYS          30A         VARLEN(10)   
+     A            CODEPOSTAL    15A         VARLEN(10)   
+     A            TELEPHONE     10A         VARLEN(8)    
+     A            EMAIL        100A         VARLEN(30)   
+     A            ADMINDATE       L                      
+     A            SALARY         8P 2                    
+     A            DEPTID        10S 0                    
+     A          K EMPLOYEID                              
+

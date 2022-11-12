@@ -1,0 +1,7 @@
+                                            UNIQUE     
+     A          R DEPT                                 
+     A            DEPTID        10S 0                  
+     A            NAME          50A         VARLEN(10) 
+     A            DIRECTEUR     10S 0       ALWNULL    
+                K DEPTID                               
+

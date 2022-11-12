@@ -1,0 +1,10 @@
+                                            UNIQUE        
+     A          R AEROPORT                                
+     A            AEROPORTID     4A                       
+     A            NOM          100A         VARLEN(30)    
+     A            ADRESSE      250A         VARLEN(50)    
+     A            VILLE         30A         VARLEN(15)    
+     A            PAYS          30A         VARLEN(15)    
+     A            CODEPOSTAL    15A         VARLEN(10)    
+     A          K AEROPORTID                              
+

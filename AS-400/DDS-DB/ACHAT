@@ -1,0 +1,10 @@
+     A                                      UNIQUE          
+     A          R ACHAT                                     
+     A            ACHATID       10S 0                       
+     A            ACHATDATE       L                         
+     A            ACHATHEURE      T                         
+     A            PRIX           7P 2                       
+     A            EMPLOYEID     10S 0                       
+     A            CLIENTID      10S 0                       
+     A          K ACHATID                                   
+

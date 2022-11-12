@@ -1,0 +1,9 @@
+                                            UNIQUE   
+     A          R SHIFT                              
+     A            SHIFTID       10S 0                
+     A            SHIFTDATE       L                  
+     A            HEUREDEBUT      T                  
+     A            HEUREFIN        T                  
+     A            EQUIPEID      10S 0                
+     A          K SHIFTID                            
+

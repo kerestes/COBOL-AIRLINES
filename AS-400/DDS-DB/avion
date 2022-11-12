@@ -1,0 +1,8 @@
+                                            UNIQUE    
+                R AVION                               
+                  AVIONID        8A                   
+     A            TYPE           8A                   
+     A            NBRSIEGE       4S 0                 
+     A            TESSENCE       4S 0                 
+                K AVIONID                             
+

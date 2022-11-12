@@ -1,0 +1,13 @@
+                                            UNIQUE      
+     A          R PASSAGER                              
+     A            CLIENTID      10S 0                   
+     A            PRENOM        30A         VARLEN(10)  
+     A            NOM           30A         VARLEN(15)  
+     A            ADRESSE      250A         VARLEN(50)  
+     A            VILLE         30A         VARLEN(10)  
+     A            PAYS          30A         VARLEN(10)  
+     A            CODEPOSTAL    15A         VARLEN(10)  
+     A            TELEPHONE     20A         VARLEN(10)  
+     A            EMAIL        100A         VARLEN(30)  
+     A          K CLIENTID                              
+
