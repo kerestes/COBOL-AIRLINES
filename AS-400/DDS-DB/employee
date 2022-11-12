@@ -1,6 +1,6 @@
      A                                      UNIQUE       
-     A          R EMPLOYE                                
-     A            EMPLOYEID     10S 0                    
+     A          R EMPLOYEE                                
+     A            EMPLOYEEID    10S 0                    
      A            PRENOM        30A         VARLEN(10)   
      A            NOM           30A         VARLEN(10)   
      A            ADRESSE      250A         VARLEN(50)   
