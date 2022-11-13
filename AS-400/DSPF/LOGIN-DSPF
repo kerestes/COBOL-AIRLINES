@@ -1,0 +1,63 @@
+     A*%%TS  SD  20221113  154055  Z13896      REL-V7R5M0  5770-WDS    
+     A*%%EC                                                            
+     A                                      DSPSIZ(24 80 *DS3)         
+     A          R LOGINDSP                                             
+     A*%%TS  SD  20221113  154055  Z13896      REL-V7R5M0  5770-WDS    
+     A                                  1  8'LOGIN PAGE'               
+     A                                      COLOR(WHT)                 
+     A                                  1 58'DATE:'                    
+     A                                      COLOR(TRQ)                 
+     A                                  2 58'HEURE:'                   
+     A                                      COLOR(TRQ)                 
+     A                                  1 65DATE                       
+     A                                      EDTCDE(Y)                  
+     A                                      COLOR(TRQ)                 
+     A                                  2 65TIME                       
+     A                                      COLOR(TRQ)                 
+     A                                  4 25'CCCCCC OOOOOO BBBBB  OOOOOO L'       
+     A                                       COLOR(YLW)                            
+     A                                  5 25'C      O    O B    B O    O L'       
+     A                                      COLOR(YLW)                            
+     A                                  6 25'C      O    O BBBBB  O    O L'       
+     A                                      COLOR(YLW)                            
+     A                                  7 25'C      O    O B    B O    O L'       
+     A                                      COLOR(YLW)                            
+     A                                  8 25'C      O    O B    B O    O L'       
+     A                                     COLOR(YLW)                            
+     A                                  9 25'CCCCCC OOOOOO BBBBB  OOOOOO LLLLL'   
+     A                                      COLOR(YLW)                            
+     A                                 11 17'A   IIIII RRRRR  L     IIIII N    -  
+     A                                      N EEEEEE SSSSSS'                      
+     A                                      COLOR(YLW)                            
+     A                                 12 16'A A    I   R    R L       I   NN  -  
+     A                                       N E      S'                          
+     A                                      COLOR(YLW)                           
+     A                                 13 15'A   A   I   RRRRR  L       I   N N- 
+     A                                        N EEEEE  SSSSSS'                   
+     A                                      COLOR(YLW)                           
+     A                                 14 15'AAAAA   I   R  R   L       I   N  - 
+     A                                      N N E           S'                   
+     A                                      COLOR(YLW)                           
+     A                                 15 15'A   A   I   R   R  L       I   N  - 
+     A                                       NN E           S'                   
+     A                                      COLOR(YLW)                           
+     A                                 16 15'A   A IIIII R    R LLLLL IIIII N  -  
+     A                                        N EEEEEE SSSSSS'                   
+     A                                      COLOR(YLW)                           
+     A                                 18 23'COBOL AIRLINES PROGRAMMING AT HEIG- 
+     A                                      HTS'                                 
+     A                                      COLOR(RED)                           
+     A                                 20 31'USERID:'                             
+     A                                      COLOR(TRQ)      
+     A                                 21 31'PASSWORD:'     
+     A                                      COLOR(TRQ)      
+     A                                 24  3'===>'          
+     A                                      COLOR(RED)      
+     A                                 23  3'===>'          
+     A                                      COLOR(RED)      
+     A            USERID         8A  I 20 41DSPATR(UL)      
+     A            PASSWORD      16A  I 21 41DSPATR(ND)      
+     A                                      DSPATR(UL)      
+     A            MSG1          68   O 23  9DSPATR(UL)      
+     A            MSG2          68   O 24  9DSPATR(UL)      
+
