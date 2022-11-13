@@ -1,0 +1,197 @@
+      *****************************************************************
+      * PROGRAM NAME                 : ISRTJSON                        
+      * IMPORTANT FILE               : PASSDOC                         
+      * PROGRAMMER                   : KERESTES                        
+      * DATE OF WRITEN               : SEPT. 2022                      
+      * TECHNOLOGY                   : CICS + COBOL + DB2              
+      *****************************************************************
+      *                   PROBLEM  DEFINITION                          
+      *                                                                
+      * THIS PROGRAM MAKE THE PASSWORD ENCRYPTATION                    
+      *****************************************************************
+      *                                                                
+      * PASSWORD, CLIENTID, ADMINDATE                                  
+      *****************************************************************
+      * OUTPUT PARAMETERS:                                             
+      *                                                                
+      * ENCRYPTED PASSWORD                                             
+      *****************************************************************
+                                                                       
+      *****************************************************************
+      *                  IDENTIFICATION DIVISION.                      
+      *****************************************************************
+                                                                       
+       IDENTIFICATION                            DIVISION.             
+       PROGRAM-ID.  ISRTJSON.                                          
+                                                                       
+      *****************************************************************
+      *                      ENVIRONMENT DIVISION.                    *
+      *****************************************************************
+                                                                       
+       ENVIRONMENT DIVISION.                                           
+                                                                       
+      *---------------------*                                          
+       INPUT-OUTPUT SECTION.                                           
+      *---------------------*                                          
+                                                                       
+           SELECT JSON1 ASSIGN TO DATABASE-EMPLORCV                    
+           ORGANIZATION IS INDEXED                                     
+           RECORD KEY IS EMPID                                         
+           ACCESS MODE IS SEQUENTIAL                                   
+           FILE STATUS IS FS-JSON1.                                    
+                                                                       
+      *****************************************************************
+      *                         DATA DIVISION.                         
+      *****************************************************************
+                                                                       
+       DATA                                      DIVISION.             
+                                                                       
+      *-------------*                                                  
+       FILE SECTION.                                                   
+      *-------------*                                           
+                                                                
+       FD JSON1.                                                
+                                                                
+       01  FILE-JSON.                                           
+           02 EMPID              PIC S9(5).                     
+           02 PASSW              PIC X(16).                     
+           02 FNAME              PIC X(30).                     
+           02 LNAME              PIC X(30).                     
+           02 ADDRE              PIC X(100).                    
+           02 CITY               PIC X(30).                     
+           02 ZIPCODE            PIC X(15).                     
+           02 TELEPHONE          PIC X(15).                     
+           02 EMAIL              PIC X(100).                    
+           02 ADMINDATE          PIC X(10).                     
+           02 SALARY             PIC S9(6)V9(2) PACKED-DECIMAL. 
+           02 DEPTID             PIC S9.                        
+                                                             
+      *------------------------*                             
+       WORKING-STORAGE SECTION.                              
+      *------------------------*                             
+                                                             
+           EXEC SQL                                          
+               SET OPTION COMMIT = *NONE                     
+           END-EXEC.                                         
+                                                             
+       01  FS-JSON1                 PIC XX.                  
+           88 FS-JSON1-OK         VALUE '00'.                
+                                                             
+       01  SUBPROGRAM               PIC X(8).                
+                                                             
+      *        WS SQL TABLE DESCRIPTION TO RECEIVE JSON FILE 
+                                                             
+       01  WS-EMPID                PIC X(8).                 
+       01  WS-SALARY               PIC $$$$$99.99.               
+                                                                 
+       01  DCLEMPLO.                                             
+           02 TABLE-EMPLO           OCCURS 32.                   
+              03 S-EMPID            PIC 9(5).                    
+              03 S-PASSW            PIC X(16).                   
+              03 S-FIRSTNAME        PIC X(30).                   
+              03 S-LASTNAME         PIC X(30).                   
+              03 S-ADDRE            PIC X(100).                  
+              03 S-CITY             PIC X(30).                   
+              03 S-ZIPCODE          PIC X(15).                   
+              03 S-TELEPHONE        PIC X(15).                   
+              03 S-EMAIL            PIC X(100).                  
+              03 S-ADMIDATE         PIC X(10).                   
+              03 S-SALARY           PIC 9(6)V9(2) PACKED-DECIMAL.
+              03 S-DEPTID           PIC 9.                       
+                                                                 
+      *                         WS COUNTERS                            
+                                                                       
+       01  FLAG-EOF                 PIC X VALUE 'N'.                   
+       01  COUNT1                   PIC 9(3) VALUE 1.                  
+                                                                       
+      *------------------*                                             
+      * SQL STATEMENTS   *                                             
+      *------------------*                                             
+                                                                       
+           EXEC SQL                                                    
+               INCLUDE SQLCA                                           
+           END-EXEC.                                                   
+                                                                       
+      ***************************************************************  
+      *                     PROCEDURE DIVISION                      *  
+      ***************************************************************  
+                                                                       
+       PROCEDURE                                 DIVISION.             
+                                                                       
+       MAIN-PARA.                                                      
+                                                                       
+           PERFORM 0100-GETTING-DATA.                                  
+      *    PERFORM 0200-INSERT-DB2 VARYING COUNT1 FROM 1 BY 1          
+      *                                    UNTIL COUNT1 > 30           
+                                                                       
+           GOBACK.                                                     
+                                                                       
+                                                                       
+      *****************************************************************
+      * 0100-GETTING-DATA.                                            *
+      *                                                               *
+      * IT RUNS THE SUBINSRT PROGRAM TO GET THE DATE INTO DE F-EMPLIST*
+      * AND INSERT THIS DATA IN THE DB2                               *
+      **************************************************************** 
+                                                                       
+       0100-GETTING-DATA.                                              
+                                                                       
+           OPEN INPUT JSON1.                                           
+                                                                       
+           IF FS-JSON1-OK                                              
+              DISPLAY 'OUVERTURE OK'                                   
+           ELSE                                                        
+              DISPLAY "ERREUR D'OUVERTURE: " FS-JSON1                  
+              GOBACK                                                   
+           END-IF                                                      
+                                                                       
+           READ JSON1                                                  
+           IF FS-JSON1-OK                                              
+              PERFORM UNTIL FLAG-EOF = 'Y'                             
+                  MOVE EMPID TO WS-EMPID(4:5)                          
+                  INSPECT WS-EMPID REPLACING ALL SPACE BY '0'          
+                  INSPECT ADMINDATE REPLACING ALL '/' BY '-'     
+                  MOVE FUNCTION UPPER-CASE(PASSW) TO PASSW      
+                  PERFORM 0200-INSERT-DB2                              
+                  MOVE 'CRYPTPGM' TO SUBPROGRAM                        
+                  CALL SUBPROGRAM USING PASSW, WS-EMPID, ADMINDATE     
+                  MOVE SPACE TO FILE-JSON                              
+                  READ JSON1                                           
+                      AT END MOVE 'Y' TO FLAG-EOF                      
+                  END-READ                                             
+              END-PERFORM                                              
+           ELSE                                                        
+              DISPLAY 'ERREUR DE LECTURE: ' FS-JSON1                   
+              GOBACK                                                   
+           END-IF                                                      
+                                                                       
+           CLOSE JSON1.                                                
+                                                                       
+      *****************************************************************
+      * 0200-INSERT-DB2.                                              *
+      *                                                               *
+      * IT INSERT THE DATA INTO DE DB2                                *
+      *****************************************************************
+                                                                       
+       0200-INSERT-DB2.                                                
+                                                                       
+           IF EMPID NOT = SPACE                                        
+                                                                       
+              EXEC SQL                                                 
+                 INSERT INTO EMPLOYEE                                     
+                     (EMPID,FIRSTNAME,LASTNAME,ADDRE,CITY,             
+                      ZIPCODE,TELEPHONE,EMAIL,ADMIDATE,SALARY,DEPTID)  
+                 VALUES                                                
+                     (:EMPID, :FNAME, :LNAME,                          
+                      :ADDRE, :CITY, :ZIPCODE,                         
+                      :TELEPHONE, :EMAIL, :ADMINDATE,                  
+                      :SALARY, :DEPTID)                                
+              END-EXEC                                                 
+                                                                       
+              IF SQLCODE NOT = 0                                       
+                 DISPLAY 'ELEMENTO ' COUNT1 ' SQLCODE: ' SQLCODE       
+                 DISPLAY 'SQLSTATE: ' SQLSTATE                         
+                 GOBACK                                                
+              END-IF                                                   
+           END-IF.                                                     
+
